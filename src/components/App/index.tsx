@@ -1,18 +1,5 @@
-import React, { useEffect } from "react";
-import {
-  Hex,
-  HexGrid,
-  Hexagon,
-  Layout,
-  Path,
-  Pattern,
-  Text,
-} from "react-hexgrid";
-
-// TODO:
-// 1. Make the movement, make the sum of the hexes with the same coordinates and value
-// 2. After that move the elements to the beggining of the array and fill the rest with 0
-// 3. After that call the server to get the new values and update the array
+import React from "react";
+import { HexGrid, Hexagon, Layout, Text } from "react-hexgrid";
 
 type HexProps = {
   x: number;
@@ -192,12 +179,12 @@ const HexagonGrid = () => {
     fetchHexValue();
   }, []);
 
-  const handleShiftUp = (hexArray: HexProps[]) => {
+  const orderNumberUp = (hexArray: HexProps[]) => {
     let hexArrayCopy = [...hexArray];
 
-    hexArrayCopy.forEach((hex, index) => {
+    hexArrayCopy.forEach((hex) => {
       const sameY = hexArrayCopy.filter((hex2) => hex2.y === hex.y);
-      sameY.forEach((hex2, index2) => {
+      sameY.forEach((hex2) => {
         if (hex2.value > hex.value && hex2.z < hex.z) {
           const tempZ = hex2.z;
           const tempX = hex2.x;
@@ -215,7 +202,7 @@ const HexagonGrid = () => {
   React.useEffect(() => {
     const handleKeyUp = (event: KeyboardEvent) => {
       if (event.key === "ArrowUp" || event.key === "w" || event.key === "W") {
-        handleShiftUp(hexArray);
+        orderNumberUp(hexArray);
       }
     };
 
@@ -234,10 +221,9 @@ const HexagonGrid = () => {
         justifyContent: "center",
         alignItems: "center",
         height: "100vh",
-        background: "red",
       }}
     >
-      <button onClick={() => handleShiftUp(hexArray)}>UP</button>
+      <button onClick={() => orderNumberUp(hexArray)}>UP</button>
       <HexGrid width={1200} height={800} viewBox="-50 -50 100 100">
         <Layout
           size={{ x: 8, y: 8 }}
@@ -245,7 +231,7 @@ const HexagonGrid = () => {
           spacing={1.1}
           origin={{ x: 0, y: 0 }}
         >
-          {hexArray?.map((hex, index) => (
+          {hexArray?.map((hex) => (
             <Hexagon
               data-y={hex.y}
               key={`${hex.x}-${hex.y}-${hex.z}`}
