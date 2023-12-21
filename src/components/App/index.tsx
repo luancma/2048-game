@@ -142,7 +142,7 @@ function generateHexagonalArray(radius: number): HexProps[] {
   return hexArray;
 }
 const HexagonGrid = () => {
-  const [hexArray, setHexArray] = React.useState<HexProps[]>([]);
+  const [hexArray, setHexArray] = React.useState<HexProps[]>(MOCK_HEX_ARRAY);
   const newArrayValue = (serverArray: HexProps[], localArray: HexProps[]) => {
     const newHexArray = localArray.map((hex: HexProps) => {
       const serverHex = serverArray.find(
@@ -158,30 +158,29 @@ const HexagonGrid = () => {
     });
     return newHexArray;
   };
-  React.useEffect(() => {
-    const radius = 4;
-    const hexagonalArray = generateHexagonalArray(radius);
+  // React.useEffect(() => {
+  //   const radius = 4;
+  //   const hexagonalArray = generateHexagonalArray(radius);
 
-    const fetchHexValue = async () => {
-      await fetch("http://localhost:13337/2", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify([]),
-      })
-        .then((res) => res.json())
-        .then((res) => res)
-        .then((res) => {
-          setHexArray(newArrayValue(res, hexagonalArray));
-        });
-    };
-    fetchHexValue();
-  }, []);
+  //   const fetchHexValue = async () => {
+  //     await fetch("http://localhost:13337/2", {
+  //       method: "POST",
+  //       headers: {
+  //         "Content-Type": "application/json",
+  //       },
+  //       body: JSON.stringify([]),
+  //     })
+  //       .then((res) => res.json())
+  //       .then((res) => res)
+  //       .then((res) => {
+  //         setHexArray(newArrayValue(res, hexagonalArray));
+  //       });
+  //   };
+  //   fetchHexValue();
+  // }, []);
 
-  const orderNumberUp = (hexArray: HexProps[]) => {
+  const orderUp = (hexArray: HexProps[]) => {
     let hexArrayCopy = [...hexArray];
-
     hexArrayCopy.forEach((hex) => {
       const sameY = hexArrayCopy.filter((hex2) => hex2.y === hex.y);
       sameY.forEach((hex2) => {
@@ -195,14 +194,27 @@ const HexagonGrid = () => {
         }
       });
     });
+    return hexArrayCopy;
+  };
 
+  const handleClickUp = (hexArray: HexProps[]) => {
+    const hexArrayCopy = orderUp(hexArray);
+    hexArrayCopy.forEach((hex) => {
+      const sameY = hexArrayCopy.filter((hex2) => hex2.y === hex.y);
+      sameY.forEach((hex2) => {
+        if (hex2.value === hex.value && hex2.z !== hex.z) {
+          hex.value = hex2.value + hex.value; // Sum the values
+          hex2.value = 0;
+        }
+      });
+    });
     setHexArray(hexArrayCopy);
   };
 
   React.useEffect(() => {
     const handleKeyUp = (event: KeyboardEvent) => {
       if (event.key === "ArrowUp" || event.key === "w" || event.key === "W") {
-        orderNumberUp(hexArray);
+        handleClickUp(hexArray);
       }
     };
 
@@ -223,7 +235,7 @@ const HexagonGrid = () => {
         height: "100vh",
       }}
     >
-      <button onClick={() => orderNumberUp(hexArray)}>UP</button>
+      <button onClick={() => handleClickUp(hexArray)}>UP</button>
       <HexGrid width={1200} height={800} viewBox="-50 -50 100 100">
         <Layout
           size={{ x: 8, y: 8 }}
