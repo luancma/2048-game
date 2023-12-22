@@ -1,6 +1,5 @@
 import React from "react";
-import { Hex, HexGrid, Hexagon, Layout, Text } from "react-hexgrid";
-import { hexagonalArray } from "../../mocks/hexagonalArray";
+import { HexGrid, Hexagon, Layout, Text } from "react-hexgrid";
 
 export type HexProps = {
   x: number;
@@ -8,12 +7,6 @@ export type HexProps = {
   z: number;
   value: number;
   hasMerged?: boolean;
-  moved?: boolean;
-  prev?: {
-    x: number;
-    y: number;
-    z: number;
-  };
 };
 
 function generateHexagonalArray(radius: number): HexProps[] {
@@ -34,45 +27,96 @@ function generateHexagonalArray(radius: number): HexProps[] {
 }
 
 export function testingClickDown(obj: HexProps[]) {
-  const result = [...obj];
-  for (let column = 0; column < result.length; column++) {
-    for (let row = 0; row < result.length; row++) {
+  let newBoard = [...obj];
+  const leftColumn = newBoard.filter((hex) => hex.y === -1);
+  const rightColumn = newBoard.filter((hex) => hex.y === 1);
+  const middleColumn = newBoard.filter((hex) => hex.y === 0);
+
+  const middleColumnSorted = middleColumn.sort((a, b) => {
+    return a.x - b.x;
+  });
+
+  const handleMiddleColumn = (arr: HexProps[]) => {
+    for (let i = arr.length - 1; i >= 0; i--) {
       if (
-        result[row].value > 0 &&
-        result[column].value === 0 &&
-        result[row].y === result[column].y &&
-        result[column].x > result[row].x
+        arr[i]?.value === 0 &&
+        arr[i - 1] &&
+        arr[i - (arr.length - 1)] &&
+        arr[i - (arr.length - 1)].value > 0 &&
+        arr[i - 1].value === 0
       ) {
-        const tempZ = result[column].z;
-        const tempX = result[column].x;
-        result[column].z = result[row].z;
-        result[column].x = result[row].x;
-        result[row].z = tempZ;
-        result[row].x = tempX;
+        arr[i].value = arr[i - 2].value;
+        arr[i - 2].value = 0;
+      }
+      if (arr[i]?.value === 0 && arr[i - 1]) {
+        arr[i].value = arr[i - 1].value;
+        arr[i - 1].value = 0;
       }
 
-      if (
-        result[row].value > 0 &&
-        result[column].value === result[row].value &&
-        result[row].y === result[column].y &&
-        result[row].z < result[column].z
-      ) {
-        const tempZ = result[column].z;
-        const tempX = result[column].x;
-        result[column].value *= 2;
-        result[column].z = result[row].z;
-        result[column].x = result[row].x;
-        result[row].z = tempZ;
-        result[row].x = tempX;
-        result[row].value = 0;
+      if (arr[i].value === arr[i - 1]?.value && arr[i].value > 0) {
+        arr[i].value *= 2;
+        arr[i - 1].value = 0;
       }
     }
-  }
-  return result;
+  };
+
+  handleMiddleColumn(middleColumnSorted);
+  handleMiddleColumn(leftColumn);
+  handleMiddleColumn(rightColumn);
+
+  newBoard = [...leftColumn, ...middleColumnSorted, ...rightColumn];
+
+  return newBoard;
+}
+
+export function testingMoveElementsToTop(obj: HexProps[]) {
+  let newBoard = [...obj];
+  const leftColumn = newBoard.filter((hex) => hex.y === -1);
+  const rightColumn = newBoard.filter((hex) => hex.y === 1);
+  const middleColumn = newBoard.filter((hex) => hex.y === 0);
+
+  const middleColumnSorted = middleColumn.sort((a, b) => {
+    return a.x - b.x;
+  });
+
+  const handleMiddleColumn = (arr: HexProps[]) => {
+    if (arr.some((hex) => hex.value > 0)) {
+      for (let i = 0; i <= arr.length - 1; i++) {
+        if (
+          arr[i]?.value === 0 &&
+          arr[i + 1] &&
+          arr[i + 1].value === 0 &&
+          arr[i + 2] &&
+          arr[i + 2].value > 0
+        ) {
+          arr[i].value = arr[i + 2].value;
+          arr[i + 2].value = 0;
+        }
+
+        if (arr[i].value === 0 && arr[i + 1]) {
+          arr[i].value = arr[i + 1].value;
+          arr[i + 1].value = 0;
+        }
+
+        if (arr[i].value === arr[i + 1]?.value && arr[i].value > 0) {
+          arr[i].value *= 2;
+          arr[i + 1].value = 0;
+        }
+      }
+    }
+  };
+
+  handleMiddleColumn(middleColumnSorted);
+  handleMiddleColumn(leftColumn);
+  handleMiddleColumn(rightColumn);
+
+  newBoard = [...leftColumn, ...middleColumnSorted, ...rightColumn];
+
+  return newBoard;
 }
 
 const HexagonGrid = () => {
-  const useMock = true;
+  const useMock = false;
   const [newItems, setNewItems] = React.useState<HexProps[]>([]);
   const [hexArray, setHexArray] = React.useState<HexProps[]>([]);
   const newArrayValue = (serverArray: HexProps[], localArray: HexProps[]) => {
@@ -115,7 +159,7 @@ const HexagonGrid = () => {
           x: -1,
           y: 0,
           z: 1,
-          value: 2,
+          value: 0,
         },
         {
           x: -1,
@@ -133,7 +177,7 @@ const HexagonGrid = () => {
           x: 0,
           y: 0,
           z: 0,
-          value: 8,
+          value: 0,
         },
         {
           x: 0,
@@ -145,137 +189,19 @@ const HexagonGrid = () => {
           x: 1,
           y: -1,
           z: 0,
-          value: 0,
+          value: 2,
         },
         {
           x: 1,
           y: 0,
           z: -1,
-          value: 0,
+          value: 8,
         },
       ]);
     } else {
       fetchHexValue();
     }
   }, []);
-
-  const orderDown = (hexArray: HexProps[]) => {
-    const useOld = true;
-    let hexArrayCopy = [...hexArray];
-    if (useOld) {
-      hexArrayCopy.forEach((hex) => {
-        const columnY = hexArrayCopy.filter((hex2) => hex2.y === hex.y);
-        columnY.forEach((hex2) => {
-          if (hex2.value > 0 && hex2.z > hex.z) {
-            const tempZ = hex2.z;
-            const tempX = hex2.x;
-            hex2.z = hex.z;
-            hex2.x = hex.x;
-            hex.z = tempZ;
-            hex.x = tempX;
-          }
-        });
-      });
-    } else {
-      hexArrayCopy.forEach((hex) => {
-        const adjacentHexes = hexArrayCopy.filter(
-          (hex2) =>
-            hex2.y === hex.y &&
-            Math.abs(hex2.x - hex.x) >= 1 &&
-            Math.abs(hex2.z - hex.z) <= 1 &&
-            hex2 !== hex
-        );
-
-        adjacentHexes.forEach((adjacentHex) => {
-          if (
-            adjacentHex.value === hex.value &&
-            hex.value > 0 &&
-            hex.value !== 2048 &&
-            adjacentHex.z > hex.z
-          ) {
-            const tempZ = adjacentHex.z;
-            const tempX = adjacentHex.x;
-
-            // Move the merged hexagon down
-            adjacentHex.z = hex.z;
-            adjacentHex.x = hex.x;
-
-            // Set the original hexagon to zero
-            hex.z = tempZ;
-            hex.x = tempX;
-            hex.value = 0;
-
-            // Update the value of the merged hexagon
-            adjacentHex.value *= 2;
-          }
-        });
-      });
-
-      // hexArrayCopy.forEach((hex) => {
-      //   const adjacentHexes = hexArrayCopy.filter(
-      //     (hex2) =>
-      //       hex2.y === hex.y &&
-      //       Math.abs(hex2.x - hex.x) <= 1 &&
-      //       Math.abs(hex2.z - hex.z) <= 1 &&
-      //       hex2 !== hex
-      //   );
-
-      //   adjacentHexes.forEach((adjacentHex) => {
-      //     if (
-      //       adjacentHex.value > 0 &&
-      //       hex.value === 0 &&
-      //       adjacentHex.z > hex.z
-      //     ) {
-      //       const tempZ = adjacentHex.z;
-      //       const tempX = adjacentHex.x;
-      //       adjacentHex.z = hex.z;
-      //       adjacentHex.x = hex.x;
-      //       hex.z = tempZ;
-      //       hex.x = tempX;
-      //     }
-      //   });
-      // });
-
-      // hexArrayCopy.forEach((hex) => {
-      //   const columnY = hexArrayCopy.filter((hex2) => hex2.y === hex.y);
-      //   columnY.forEach((hex2) => {
-      //     if (hex2.value > 0 && hex.value === 0 && hex2.z > hex.z) {
-      //       const tempZ = hex2.z;
-      //       const tempX = hex2.x;
-      //       hex2.z = hex.z;
-      //       hex2.x = hex.x;
-      //       hex.z = tempZ;
-      //       hex.x = tempX;
-      //     }
-      //   });
-      // });
-    }
-    return hexArrayCopy;
-  };
-
-  const handleClickDown = (hexArray: HexProps[]) => {
-    const hexArrayCopy = orderDown(hexArray);
-    setHexArray(hexArrayCopy);
-    return;
-    hexArrayCopy.forEach((hex) => {
-      const sameY = hexArrayCopy.filter((hex2) => hex2.y === hex.y);
-      sameY.forEach((hex2) => {
-        if (
-          hex2.value === hex.value &&
-          hex2.z !== hex.z &&
-          hex.hasMerged !== true &&
-          hex2.hasMerged !== true
-        ) {
-          hex.value = hex2.value + hex.value; // Sum the values
-          hex.hasMerged = true; // Prevents the hex from being merged again
-          hex2.value = 0;
-        }
-      });
-    });
-    orderDown(hexArrayCopy);
-    setHexArray(orderDown(hexArrayCopy));
-    getNewServerList();
-  };
 
   const orderUp = (hexArray: HexProps[]) => {
     let hexArrayCopy = [...hexArray];
@@ -293,28 +219,6 @@ const HexagonGrid = () => {
       });
     });
     return hexArrayCopy;
-  };
-
-  const handleClickUp = (hexArray: HexProps[]) => {
-    const hexArrayCopy = orderUp(hexArray);
-    hexArrayCopy.forEach((hex) => {
-      const sameY = hexArrayCopy.filter((hex2) => hex2.y === hex.y);
-      sameY.forEach((hex2) => {
-        if (
-          hex2.value === hex.value &&
-          hex2.z !== hex.z &&
-          hex.hasMerged !== true &&
-          hex2.hasMerged !== true
-        ) {
-          hex.value = hex2.value + hex.value; // Sum the values
-          hex.hasMerged = true; // Prevents the hex from being merged again
-          hex2.value = 0;
-        }
-      });
-    });
-    orderUp(hexArrayCopy);
-    setHexArray(orderUp(hexArrayCopy));
-    getNewServerList();
   };
 
   const getNewServerList = () => {
@@ -359,15 +263,17 @@ const HexagonGrid = () => {
   React.useEffect(() => {
     const handleKeyUp = (event: KeyboardEvent) => {
       if (event.key === "ArrowUp" || event.key === "w" || event.key === "W") {
-        handleClickUp(hexArray);
+        const newList = testingMoveElementsToTop(hexArray);
+        setHexArray(newList);
+        if (!useMock) getNewServerList();
       }
     };
 
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === "ArrowDown" || event.key === "s" || event.key === "S") {
         const newList = testingClickDown(hexArray);
-        console.log(newList);
         setHexArray(newList);
+        if (!useMock) getNewServerList();
       }
     };
 
