@@ -1,5 +1,8 @@
 import React from "react";
 import { HexGrid, Hexagon, Layout, Text } from "react-hexgrid";
+import { MoveHexagonsDown } from "../../features/phase-1/MoveHexagonsDown";
+import { MoveHexagonsTop } from "../../features/phase-1/MoveHexagonsTop";
+import { MoveHexagonsBottomLeft } from "../../features/phase-1/MoveHexagonsBottomLeft";
 
 export type HexProps = {
   x: number;
@@ -26,97 +29,8 @@ function generateHexagonalArray(radius: number): HexProps[] {
   return hexArray;
 }
 
-export function testingClickDown(obj: HexProps[]) {
-  let newBoard = [...obj];
-  const leftColumn = newBoard.filter((hex) => hex.y === -1);
-  const rightColumn = newBoard.filter((hex) => hex.y === 1);
-  const middleColumn = newBoard.filter((hex) => hex.y === 0);
-
-  const middleColumnSorted = middleColumn.sort((a, b) => {
-    return a.x - b.x;
-  });
-
-  const handleMiddleColumn = (arr: HexProps[]) => {
-    for (let i = arr.length - 1; i >= 0; i--) {
-      if (
-        arr[i]?.value === 0 &&
-        arr[i - 1] &&
-        arr[i - (arr.length - 1)] &&
-        arr[i - (arr.length - 1)].value > 0 &&
-        arr[i - 1].value === 0
-      ) {
-        arr[i].value = arr[i - 2].value;
-        arr[i - 2].value = 0;
-      }
-      if (arr[i]?.value === 0 && arr[i - 1]) {
-        arr[i].value = arr[i - 1].value;
-        arr[i - 1].value = 0;
-      }
-
-      if (arr[i].value === arr[i - 1]?.value && arr[i].value > 0) {
-        arr[i].value *= 2;
-        arr[i - 1].value = 0;
-      }
-    }
-  };
-
-  handleMiddleColumn(middleColumnSorted);
-  handleMiddleColumn(leftColumn);
-  handleMiddleColumn(rightColumn);
-
-  newBoard = [...leftColumn, ...middleColumnSorted, ...rightColumn];
-
-  return newBoard;
-}
-
-export function testingMoveElementsToTop(obj: HexProps[]) {
-  let newBoard = [...obj];
-  const leftColumn = newBoard.filter((hex) => hex.y === -1);
-  const rightColumn = newBoard.filter((hex) => hex.y === 1);
-  const middleColumn = newBoard.filter((hex) => hex.y === 0);
-
-  const middleColumnSorted = middleColumn.sort((a, b) => {
-    return a.x - b.x;
-  });
-
-  const handleMiddleColumn = (arr: HexProps[]) => {
-    if (arr.some((hex) => hex.value > 0)) {
-      for (let i = 0; i <= arr.length - 1; i++) {
-        if (
-          arr[i]?.value === 0 &&
-          arr[i + 1] &&
-          arr[i + 1].value === 0 &&
-          arr[i + 2] &&
-          arr[i + 2].value > 0
-        ) {
-          arr[i].value = arr[i + 2].value;
-          arr[i + 2].value = 0;
-        }
-
-        if (arr[i].value === 0 && arr[i + 1]) {
-          arr[i].value = arr[i + 1].value;
-          arr[i + 1].value = 0;
-        }
-
-        if (arr[i].value === arr[i + 1]?.value && arr[i].value > 0) {
-          arr[i].value *= 2;
-          arr[i + 1].value = 0;
-        }
-      }
-    }
-  };
-
-  handleMiddleColumn(middleColumnSorted);
-  handleMiddleColumn(leftColumn);
-  handleMiddleColumn(rightColumn);
-
-  newBoard = [...leftColumn, ...middleColumnSorted, ...rightColumn];
-
-  return newBoard;
-}
-
 const HexagonGrid = () => {
-  const useMock = false;
+  const useMock = true;
   const [newItems, setNewItems] = React.useState<HexProps[]>([]);
   const [hexArray, setHexArray] = React.useState<HexProps[]>([]);
   const newArrayValue = (serverArray: HexProps[], localArray: HexProps[]) => {
@@ -152,26 +66,25 @@ const HexagonGrid = () => {
           setHexArray(newArrayValue(res, hexagonalArray));
         });
     };
-
     if (useMock) {
       setHexArray([
         {
           x: -1,
           y: 0,
           z: 1,
-          value: 0,
+          value: 4,
         },
         {
           x: -1,
           y: 1,
           z: 0,
-          value: 0,
+          value: 4,
         },
         {
           x: 0,
           y: -1,
           z: 1,
-          value: 2,
+          value: 4,
         },
         {
           x: 0,
@@ -183,7 +96,7 @@ const HexagonGrid = () => {
           x: 0,
           y: 1,
           z: -1,
-          value: 2,
+          value: 0,
         },
         {
           x: 1,
@@ -195,31 +108,13 @@ const HexagonGrid = () => {
           x: 1,
           y: 0,
           z: -1,
-          value: 8,
+          value: 4,
         },
       ]);
     } else {
       fetchHexValue();
     }
   }, []);
-
-  const orderUp = (hexArray: HexProps[]) => {
-    let hexArrayCopy = [...hexArray];
-    hexArrayCopy.forEach((hex) => {
-      const sameY = hexArrayCopy.filter((hex2) => hex2.y === hex.y);
-      sameY.forEach((hex2) => {
-        if (hex.value === 0 && hex2.z < hex.z) {
-          const tempZ = hex2.z;
-          const tempX = hex2.x;
-          hex2.z = hex.z;
-          hex2.x = hex.x;
-          hex.z = tempZ;
-          hex.x = tempX;
-        }
-      });
-    });
-    return hexArrayCopy;
-  };
 
   const getNewServerList = () => {
     const filteredHexWithValues = hexArray
@@ -263,7 +158,8 @@ const HexagonGrid = () => {
   React.useEffect(() => {
     const handleKeyUp = (event: KeyboardEvent) => {
       if (event.key === "ArrowUp" || event.key === "w" || event.key === "W") {
-        const newList = testingMoveElementsToTop(hexArray);
+        const handleMovement = new MoveHexagonsTop();
+        const newList = handleMovement.execute(hexArray);
         setHexArray(newList);
         if (!useMock) getNewServerList();
       }
@@ -271,20 +167,31 @@ const HexagonGrid = () => {
 
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === "ArrowDown" || event.key === "s" || event.key === "S") {
-        const newList = testingClickDown(hexArray);
+        const handleMoveDown = new MoveHexagonsDown();
+        const newList = handleMoveDown.execute(hexArray);
+        setHexArray(newList);
+        if (!useMock) getNewServerList();
+      }
+    };
+
+    const handleKeyboardBottomLeft = (event: KeyboardEvent) => {
+      if (event.key === "ArrowLeft" || event.key === "a" || event.key === "A") {
+        const handleMoveDown = new MoveHexagonsBottomLeft();
+        const newList = handleMoveDown.execute(hexArray);
         setHexArray(newList);
         if (!useMock) getNewServerList();
       }
     };
 
     window.addEventListener("keydown", handleKeyDown);
-
+    window.addEventListener("keydown", handleKeyboardBottomLeft);
     window.addEventListener("keyup", handleKeyUp);
 
     // Cleanup function to remove the event listener when the component unmounts
     return () => {
       window.removeEventListener("keyup", handleKeyUp);
       window.removeEventListener("keydown", handleKeyDown);
+      window.removeEventListener("keydown", handleKeyboardBottomLeft);
     };
   }, [hexArray]);
 
@@ -308,7 +215,6 @@ const HexagonGrid = () => {
         height: "100vh",
       }}
     >
-      <button onClick={() => orderUp(hexArray)}>UP DEBUG</button>
       <HexGrid width={1200} height={800} viewBox="-50 -50 100 100">
         <Layout
           size={{ x: 8, y: 8 }}
