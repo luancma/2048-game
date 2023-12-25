@@ -78,7 +78,7 @@ const HexagonGrid = () => {
           x: -1,
           y: 1,
           z: 0,
-          value: 8,
+          value: 4,
         },
         {
           x: 0,
@@ -96,7 +96,7 @@ const HexagonGrid = () => {
           x: 0,
           y: 1,
           z: -1,
-          value: 0,
+          value: 4,
         },
         {
           x: 1,
@@ -108,7 +108,7 @@ const HexagonGrid = () => {
           x: 1,
           y: 0,
           z: -1,
-          value: 4,
+          value: 0,
         },
       ]);
     } else {

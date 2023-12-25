@@ -3,85 +3,145 @@ import { HexProps } from "../../components/App";
 export class MoveHexagonsBottomLeft {
   constructor() {}
   moveHexagons = (hexagonsArray: HexProps[]) => {
-    const result = [...hexagonsArray];
-    for (let i = -1; i < 2; i++) {
-      // 4 4 -> 8 0
-      if (
-        result[i]?.value > 0 &&
-        result[i]?.value === result[i + 1]?.value &&
-        result[i].x > result[i + 1].x &&
-        !result[i + 2]
-      ) {
-        result[i].value *= 2;
-        result[i + 1].value = 0;
-      }
-      // 4 4 8 -> 8 8 0
-      if (
-        result[i + 2]?.value > 0 &&
-        result[i + 2]?.value < result[i]?.value &&
-        result[i + i]?.value === result[i]?.value
-      ) {
-        result[i + 2].value *= 2;
-        result[i + 1].value = result[i].value;
-        result[i].value = 0;
-        break;
-      }
-      // 0 4 8 -> 4 8 0
-      if (
-        result[i] &&
-        result[i + 1] &&
-        result[i + 2] &&
-        result[i]?.value > 0 &&
-        result[i + 1]?.value > 0 &&
-        result[i + 2]?.value === 0
-      ) {
-        result[i + 2].value = result[i + 1].value;
-        result[i + 1].value = result[i].value;
-        result[i].value = 0;
-      }
-      if (result[i]?.value > 0 && result[i].value === result[i + 1]?.value) {
-        // if (result[i + 2]?.value === null && result[i + 1].x > result[i].x) {
-        //   result[i + 1].value *= 2;
-        //   result[i].value = 0;
-        //   break;
-        // }
+    const hasThreeItems = hexagonsArray.length === 3;
+    const newOrder = (overrideArr = hexagonsArray) => {
+      let clonedArray = [...overrideArr];
+
+      clonedArray.forEach((item, i) => {
+        const nextItem = clonedArray[i + 1];
+        const nextNextItem = clonedArray[i + 2];
+        // 4 0 4 -> 4 4 0
         if (
-          result[i + 2]?.value > 0 &&
-          result[i + 2].value === result[i].value
+          hasThreeItems &&
+          item.value > 0 &&
+          nextItem?.value === 0 &&
+          nextNextItem?.value > 0
         ) {
-          result[i + 2].value *= 2;
-          result[i + 1].value = result[i].value;
-          result[i].value = 0;
-          break;
+          nextItem.value = item.value;
+          item.value = 0;
+          return;
         }
-        // if (result[i + 2]?.value > 0 && result[i + 2].value > result[i].value) {
-        //   console.log("AAAAA");
-        // }
-        else {
-          result[i + 1].value *= 2;
-          result[i].value = 0;
-          break;
+        // 0 0 4 -> 4 0 0
+        if (
+          hasThreeItems &&
+          item.value > 0 &&
+          nextItem?.value === 0 &&
+          nextNextItem?.value === 0
+        ) {
+          nextNextItem.value = item.value;
+          nextItem.value = 0;
+          item.value = 0;
+          return;
         }
-      }
-    }
-    return result;
+        if (
+          hasThreeItems &&
+          item.value === 0 &&
+          nextItem?.value > 0 &&
+          nextNextItem?.value > 0
+        ) {
+          item.value = nextItem.value;
+          nextItem.value = nextNextItem.value;
+          nextNextItem.value = 0;
+          return;
+        }
+        return item;
+      });
+      return clonedArray;
+    };
+    const mergeNearByItems = (overrideArr = hexagonsArray) => {
+      const hasThreeItems = overrideArr.length === 3;
+      const orderedArr = newOrder(overrideArr);
+      orderedArr.map((item, i) => {
+        // 0 8 8 -> 16 0 0
+        if (
+          hasThreeItems &&
+          item.value === 0 &&
+          item?.value === orderedArr[i + 1]?.value
+        ) {
+          item.value = item.value * 2;
+          orderedArr[i + 1].value = 0;
+        }
+        // 0 4 0 -> 4 0 0 || 0 0 4 -> 4 0 0
+        if (
+          hasThreeItems &&
+          item.value === 0 &&
+          orderedArr[i + 1]?.value > 0 &&
+          orderedArr[i + 2]?.value === 0
+        ) {
+          item.value = orderedArr[i + 1].value;
+          orderedArr[i + 1].value = 0;
+        }
+        // 8 4 4 -> 8 8 0
+        if (
+          hasThreeItems &&
+          item.value > 0 &&
+          orderedArr[i + 1]?.value === item.value &&
+          orderedArr[i + 2]?.value > item.value
+        ) {
+          orderedArr[i + 1].value *= 2;
+          item.value = 0;
+        }
+        if (
+          hasThreeItems &&
+          orderedArr[i + 1]?.value > 0 &&
+          orderedArr[i + 2]?.value > 0 &&
+          orderedArr[i + 1]?.value === orderedArr[i + 2]?.value &&
+          orderedArr[i]?.value > orderedArr[i + 1]?.value
+        ) {
+          orderedArr[i + 2].value *= 2;
+          orderedArr[i + 1].value = item.value;
+          item.value = 0;
+        }
+        if (
+          orderedArr.length === 2 &&
+          item?.value > 0 &&
+          item?.value === orderedArr[i + 1]?.value
+        ) {
+          orderedArr[i + 1].value *= 2;
+          item.value = 0;
+        }
+        if (
+          orderedArr.length === 3 &&
+          item?.value > 0 &&
+          orderedArr[i + 2]?.value === 0 &&
+          orderedArr[i + 1]?.value > 0 &&
+          item?.value !== orderedArr[i + 1]?.value
+        ) {
+          orderedArr[i + 2].value = orderedArr[i + 1].value;
+          orderedArr[i + 1].value = item.value;
+          item.value = 0;
+        }
+        if (
+          hasThreeItems &&
+          item?.value === orderedArr[i + 1]?.value &&
+          orderedArr[i + 1]?.value === orderedArr[i + 2]?.value
+        ) {
+          orderedArr[i + 2].value *= 2;
+          orderedArr[i + 1].value = item.value;
+          item.value = 0;
+        }
+        return item;
+      });
+      return orderedArr;
+    };
+    return mergeNearByItems();
   };
   execute(hexagonsArray: HexProps[]) {
     let newBoard = [...hexagonsArray];
-    const leftColumn = newBoard.filter((hex) => hex.z === -1);
-    const rightColumn = newBoard.filter((hex) => hex.z === 1);
+    const leftColumn = newBoard.filter((hex) => hex.z === 1);
     const middleColumn = newBoard.filter((hex) => hex.z === 0);
+    const rightColumn = newBoard.filter((hex) => hex.z === -1);
 
-    const middleColumnSorted = middleColumn.sort((a, b) => {
-      return a.x - b.x;
-    });
+    const sortListByX = (list: HexProps[]) => {
+      return list.sort((a, b) => {
+        return a.x - b.x;
+      });
+    };
 
-    const middleResult = this.moveHexagons(middleColumnSorted);
-    const leftResult = this.moveHexagons(leftColumn);
-    const rightResult = this.moveHexagons(rightColumn);
+    const middleResult = this.moveHexagons(sortListByX(middleColumn));
+    const leftResult = this.moveHexagons(sortListByX(leftColumn));
+    const rightResult = rightColumn;
 
-    newBoard = [...leftResult, ...middleResult, ...rightResult];
-
-    return newBoard;
+    return [...leftResult, ...middleResult, ...rightResult];
   }
 }
