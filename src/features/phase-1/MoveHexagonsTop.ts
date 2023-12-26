@@ -1,4 +1,4 @@
-import { HexProps } from "../../components/App";
+import { HexProps } from "../../App";
 
 export function testingMoveElementsToTop(obj: HexProps[]) {}
 

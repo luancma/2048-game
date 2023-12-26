@@ -1,8 +1,9 @@
 import React from "react";
-import { HexGrid, Hexagon, Layout, Text } from "react-hexgrid";
-import { MoveHexagonsDown } from "../../features/phase-1/MoveHexagonsDown";
-import { MoveHexagonsTop } from "../../features/phase-1/MoveHexagonsTop";
-import { MoveHexagonsBottomLeft } from "../../features/phase-1/MoveHexagonsBottomLeft";
+import { MoveHexagonsDown } from "../features/phase-1/MoveHexagonsDown";
+import { MoveHexagonsTop } from "../features/phase-1/MoveHexagonsTop";
+import { MoveHexagonsBottomLeft } from "../features/phase-1/BottomLeft/MoveHexagonsBottomLeft";
+import { Grid } from "../components/Grid";
+import { mockHexagonalArrayRadius2 } from "../mocks/hexagonalArray";
 
 export type HexProps = {
   x: number;
@@ -51,7 +52,9 @@ const HexagonGrid = () => {
 
   React.useEffect(() => {
     const radius = 3;
-    const hexagonalArray = generateHexagonalArray(radius);
+    const hexagonalArray = useMock
+      ? mockHexagonalArrayRadius2
+      : generateHexagonalArray(radius);
     const fetchHexValue = async () => {
       await fetch("http://localhost:13337/2", {
         method: "POST",
@@ -67,50 +70,7 @@ const HexagonGrid = () => {
         });
     };
     if (useMock) {
-      setHexArray([
-        {
-          x: -1,
-          y: 0,
-          z: 1,
-          value: 4,
-        },
-        {
-          x: -1,
-          y: 1,
-          z: 0,
-          value: 4,
-        },
-        {
-          x: 0,
-          y: -1,
-          z: 1,
-          value: 4,
-        },
-        {
-          x: 0,
-          y: 0,
-          z: 0,
-          value: 4,
-        },
-        {
-          x: 0,
-          y: 1,
-          z: -1,
-          value: 4,
-        },
-        {
-          x: 1,
-          y: -1,
-          z: 0,
-          value: 4,
-        },
-        {
-          x: 1,
-          y: 0,
-          z: -1,
-          value: 0,
-        },
-      ]);
+      setHexArray(hexagonalArray);
     } else {
       fetchHexValue();
     }
@@ -178,6 +138,9 @@ const HexagonGrid = () => {
       if (event.key === "ArrowLeft" || event.key === "a" || event.key === "A") {
         const handleMoveDown = new MoveHexagonsBottomLeft();
         const newList = handleMoveDown.execute(hexArray);
+        newList.forEach((hex) => {
+          hex.hasMerged = false;
+        });
         setHexArray(newList);
         if (!useMock) getNewServerList();
       }
@@ -215,51 +178,7 @@ const HexagonGrid = () => {
         height: "100vh",
       }}
     >
-      <HexGrid width={1200} height={800} viewBox="-50 -50 100 100">
-        <Layout
-          size={{ x: 8, y: 8 }}
-          flat={true}
-          spacing={1.1}
-          origin={{ x: 0, y: 0 }}
-        >
-          {hexArray?.map((hex) => (
-            <Hexagon
-              data-y={hex.y}
-              data-x={hex.x}
-              data-z={hex.z}
-              data-value={hex.value}
-              key={`${hex.x}-${hex.y}-${hex.z}`}
-              q={hex.y}
-              r={hex.x}
-              s={hex.z}
-              style={{
-                fill: manageColor(hex),
-              }}
-            >
-              <Text
-                style={{
-                  fill: "white",
-                  fontSize: "2px",
-                  zIndex: 3,
-                }}
-              >
-                x: {hex.x}
-                y: {hex.y}
-                z: {hex.z}
-              </Text>
-              <Text
-                style={{
-                  fill: "red",
-                  fontSize: "4px",
-                  transform: "translate(0, -4px)",
-                }}
-              >
-                {hex.value}
-              </Text>
-            </Hexagon>
-          ))}
-        </Layout>
-      </HexGrid>
+      <Grid hexArray={hexArray} manageColor={manageColor} />
     </div>
   );
 };

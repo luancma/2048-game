@@ -1,4 +1,4 @@
-import { HexProps } from "../../components/App";
+import { HexProps } from "../../App";
 
 export class MoveHexagonsDown {
   constructor() {}
