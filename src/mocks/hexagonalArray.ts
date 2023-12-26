@@ -9,7 +9,7 @@ export const mockHexagonalArrayRadius2 = [
     x: -1,
     y: 1,
     z: 0,
-    value: 8,
+    value: 4,
   },
   {
     x: 0,

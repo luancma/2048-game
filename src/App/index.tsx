@@ -4,6 +4,8 @@ import { MoveHexagonsTop } from "../features/phase-1/MoveHexagonsTop";
 import { MoveHexagonsBottomLeft } from "../features/phase-1/BottomLeft/MoveHexagonsBottomLeft";
 import { Grid } from "../components/Grid";
 import { mockHexagonalArrayRadius2 } from "../mocks/hexagonalArray";
+import { HandleTopRight } from "../features/phase-1/TopRight/HandleTopRight";
+import { SharedTopMovements } from "../features/phase-1/SharedTopMovements";
 
 export type HexProps = {
   x: number;
@@ -31,7 +33,7 @@ function generateHexagonalArray(radius: number): HexProps[] {
 }
 
 const HexagonGrid = () => {
-  const useMock = true;
+  const useMock = false;
   const [newItems, setNewItems] = React.useState<HexProps[]>([]);
   const [hexArray, setHexArray] = React.useState<HexProps[]>([]);
   const newArrayValue = (serverArray: HexProps[], localArray: HexProps[]) => {
@@ -51,7 +53,7 @@ const HexagonGrid = () => {
   };
 
   React.useEffect(() => {
-    const radius = 3;
+    const radius = 2;
     const hexagonalArray = useMock
       ? mockHexagonalArrayRadius2
       : generateHexagonalArray(radius);
@@ -117,7 +119,7 @@ const HexagonGrid = () => {
 
   React.useEffect(() => {
     const handleKeyUp = (event: KeyboardEvent) => {
-      if (event.key === "ArrowUp" || event.key === "w" || event.key === "W") {
+      if (event.key === "w" || event.key === "W") {
         const handleMovement = new MoveHexagonsTop();
         const newList = handleMovement.execute(hexArray);
         setHexArray(newList);
@@ -126,7 +128,7 @@ const HexagonGrid = () => {
     };
 
     const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "ArrowDown" || event.key === "s" || event.key === "S") {
+      if (event.key === "s" || event.key === "S") {
         const handleMoveDown = new MoveHexagonsDown();
         const newList = handleMoveDown.execute(hexArray);
         setHexArray(newList);
@@ -135,7 +137,7 @@ const HexagonGrid = () => {
     };
 
     const handleKeyboardBottomLeft = (event: KeyboardEvent) => {
-      if (event.key === "ArrowLeft" || event.key === "a" || event.key === "A") {
+      if (event.key === "a" || event.key === "A") {
         const handleMoveDown = new MoveHexagonsBottomLeft();
         const newList = handleMoveDown.execute(hexArray);
         newList.forEach((hex) => {
@@ -146,15 +148,59 @@ const HexagonGrid = () => {
       }
     };
 
+    const handleKeyboardTopRight = (event: KeyboardEvent) => {
+      if (event.key === "e" || event.key === "E") {
+        const handleMoveDown = new SharedTopMovements("x", "z");
+        const newList = handleMoveDown.execute(hexArray);
+        newList.forEach((hex) => {
+          hex.hasMerged = false;
+        });
+        setHexArray(newList);
+        if (!useMock) getNewServerList();
+      }
+    };
+
+    const handleKeyboardTopLeft = (event: KeyboardEvent) => {
+      if (event.key === "q" || event.key === "Q") {
+        const handleMoveDown = new SharedTopMovements("y", "x");
+        const newList = handleMoveDown.execute(hexArray);
+        console.log(newList.filter((hex) => hex.x === -1));
+        newList.forEach((hex) => {
+          hex.hasMerged = false;
+        });
+        setHexArray(newList);
+        if (!useMock) getNewServerList();
+      }
+    };
+
+    const handleKeyboardBottomRight = (event: KeyboardEvent) => {
+      if (event.key === "d" || event.key === "D") {
+        const handleMoveDown = new SharedTopMovements("z", "x");
+        const newList = handleMoveDown.execute(hexArray);
+        console.log(newList.filter((hex) => hex.x === -1));
+        newList.forEach((hex) => {
+          hex.hasMerged = false;
+        });
+        setHexArray(newList);
+        if (!useMock) getNewServerList();
+      }
+    };
+
     window.addEventListener("keydown", handleKeyDown);
     window.addEventListener("keydown", handleKeyboardBottomLeft);
-    window.addEventListener("keyup", handleKeyUp);
+    window.addEventListener("keydown", handleKeyboardTopLeft);
+    window.addEventListener("keydown", handleKeyboardTopRight);
+    window.addEventListener("keydown", handleKeyboardBottomRight);
+    window.addEventListener("keydown", handleKeyUp);
 
     // Cleanup function to remove the event listener when the component unmounts
     return () => {
-      window.removeEventListener("keyup", handleKeyUp);
+      window.removeEventListener("keydown", handleKeyUp);
       window.removeEventListener("keydown", handleKeyDown);
+      window.removeEventListener("keydown", handleKeyboardTopLeft);
       window.removeEventListener("keydown", handleKeyboardBottomLeft);
+      window.removeEventListener("keydown", handleKeyboardBottomRight);
+      window.removeEventListener("keydown", handleKeyboardTopRight);
     };
   }, [hexArray]);
 

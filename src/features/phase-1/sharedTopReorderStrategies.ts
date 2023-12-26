@@ -1,15 +1,17 @@
-import { HexProps } from "../../../../App";
+import { HexProps } from "../../App";
 
 const MoveSingleHexagon = (
   currentHexagon: HexProps,
   adjacentHexagon: HexProps,
   nextAdjacentHexagon: HexProps,
-  hasLengthThree: boolean
+  hasLengthThree: boolean,
+  hasMerged: boolean
 ) => {
   if (
     !hasLengthThree &&
     currentHexagon.value > 0 &&
-    adjacentHexagon?.value === 0
+    adjacentHexagon?.value === 0 &&
+    !hasMerged
   ) {
     adjacentHexagon.value = currentHexagon.value;
     currentHexagon.value = 0;
@@ -19,7 +21,8 @@ const MoveSingleHexagon = (
     hasLengthThree &&
     currentHexagon.value > 0 &&
     adjacentHexagon.value === 0 &&
-    nextAdjacentHexagon.value === 0
+    nextAdjacentHexagon.value === 0 &&
+    !hasMerged
   ) {
     nextAdjacentHexagon.value = currentHexagon.value;
     currentHexagon.value = 0;
@@ -29,7 +32,8 @@ const MoveSingleHexagon = (
     hasLengthThree &&
     adjacentHexagon.value > 0 &&
     currentHexagon.value === 0 &&
-    nextAdjacentHexagon.value === 0
+    nextAdjacentHexagon.value === 0 &&
+    !hasMerged
   ) {
     nextAdjacentHexagon.value = adjacentHexagon.value;
     adjacentHexagon.value = 0;
@@ -40,13 +44,15 @@ const MoveTwoHexagons = (
   currentHexagon: HexProps,
   adjacentHexagon: HexProps,
   nextAdjacentHexagon: HexProps,
-  hasLengthThree: boolean
+  hasLengthThree: boolean,
+  hasMerged: boolean
 ) => {
   if (
     hasLengthThree &&
     currentHexagon.value > 0 &&
     adjacentHexagon.value > 0 &&
-    nextAdjacentHexagon.value === 0
+    nextAdjacentHexagon.value === 0 &&
+    !hasMerged
   ) {
     nextAdjacentHexagon.value = adjacentHexagon.value;
     adjacentHexagon.value = currentHexagon.value;
@@ -57,7 +63,8 @@ const MoveTwoHexagons = (
     hasLengthThree &&
     currentHexagon.value > 0 &&
     adjacentHexagon.value === 0 &&
-    nextAdjacentHexagon.value > 0
+    nextAdjacentHexagon.value > 0 &&
+    !hasMerged
   ) {
     adjacentHexagon.value = currentHexagon.value;
     currentHexagon.value = 0;
@@ -65,11 +72,12 @@ const MoveTwoHexagons = (
 };
 
 const reorderStrategies: any = {
-  MoveSingleHexagon: MoveSingleHexagon,
   MoveTwoHexagons: MoveTwoHexagons,
-};
+  MoveSingleHexagon: MoveSingleHexagon,
+  };
+  
 
-export const applyReorderStrategies = (orderedArr: HexProps[]) => {
+export const sharedTopReorderStrategies = (orderedArr: HexProps[]) => {
   orderedArr.forEach((_, index) => {
     const currentHexagon = orderedArr[index];
     const adjacentHexagon = orderedArr[Number(index) + 1];
@@ -78,13 +86,19 @@ export const applyReorderStrategies = (orderedArr: HexProps[]) => {
     const hasLengthThree =
       currentHexagon && adjacentHexagon && nextAdjacentHexagon;
 
+    const hasMerged =
+      currentHexagon?.hasMerged === true ||
+      adjacentHexagon?.hasMerged === true ||
+      nextAdjacentHexagon?.hasMerged === true;
+
     for (const strategyKey in reorderStrategies) {
       const strategy = reorderStrategies[strategyKey];
       strategy(
         currentHexagon,
         adjacentHexagon,
         nextAdjacentHexagon,
-        hasLengthThree
+        hasLengthThree,
+        hasMerged
       );
     }
   });
