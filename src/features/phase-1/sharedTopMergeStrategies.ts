@@ -70,6 +70,34 @@ const DefaultMergeStrategy = (
     adjacentHexagon.value = currentHexagon.value;
     currentHexagon.value = 0;
   }
+  // 2 16 16 -> 0 2 32
+  if (
+    hasLengthThree &&
+    !hasMerged &&
+    currentHexagon.value > 0 &&
+    adjacentHexagon.value > 0 &&
+    nextAdjacentHexagon?.value > 0 &&
+    adjacentHexagon.value === nextAdjacentHexagon?.value
+  ) {
+    nextAdjacentHexagon.value *= 2;
+    nextAdjacentHexagon.hasMerged = true;
+    adjacentHexagon.value = currentHexagon.value;
+    currentHexagon.value = 0;
+  }
+  // 2 16 16 -> 2 32 0
+  if (
+    hasLengthThree &&
+    !hasMerged &&
+    currentHexagon?.value > 0 &&
+    adjacentHexagon?.value > 0 &&
+    nextAdjacentHexagon?.value > 0 &&
+    adjacentHexagon.value === currentHexagon?.value &&
+    nextAdjacentHexagon.value < currentHexagon.value
+  ) {
+    nextAdjacentHexagon.hasMerged = true;
+    adjacentHexagon.value *= 2
+    currentHexagon.value = 0;
+  }
 };
 
 const mergeStrategies: any = {

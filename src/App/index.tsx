@@ -1,10 +1,8 @@
 import React from "react";
 import { MoveHexagonsDown } from "../features/phase-1/MoveHexagonsDown";
 import { MoveHexagonsTop } from "../features/phase-1/MoveHexagonsTop";
-import { MoveHexagonsBottomLeft } from "../features/phase-1/BottomLeft/MoveHexagonsBottomLeft";
 import { Grid } from "../components/Grid";
 import { mockHexagonalArrayRadius2 } from "../mocks/hexagonalArray";
-import { HandleTopRight } from "../features/phase-1/TopRight/HandleTopRight";
 import { SharedTopMovements } from "../features/phase-1/SharedTopMovements";
 
 export type HexProps = {
@@ -33,8 +31,10 @@ function generateHexagonalArray(radius: number): HexProps[] {
 }
 
 const HexagonGrid = () => {
-  const useMock = false;
+  const useMock = true;
+  const [isGameOver, setIsGameOver] = React.useState<boolean>(false);
   const [newItems, setNewItems] = React.useState<HexProps[]>([]);
+  const [newMoves, setNewMoves] = React.useState<HexProps[]>([]);
   const [hexArray, setHexArray] = React.useState<HexProps[]>([]);
   const newArrayValue = (serverArray: HexProps[], localArray: HexProps[]) => {
     const newHexArray = localArray.map((hex: HexProps) => {
@@ -53,12 +53,17 @@ const HexagonGrid = () => {
   };
 
   React.useEffect(() => {
-    const radius = 2;
+    const queryString = window.location.search.substring(1);
+    const urlParams = new URLSearchParams(queryString);
+    const port = parseInt(urlParams.get("port"), 10) || 13337;
+    const radius = parseInt(urlParams.get("radius"), 10) || 2;
+
     const hexagonalArray = useMock
       ? mockHexagonalArrayRadius2
       : generateHexagonalArray(radius);
+
     const fetchHexValue = async () => {
-      await fetch("http://localhost:13337/2", {
+      await fetch(`http://localhost:${port}/${radius}`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -71,6 +76,7 @@ const HexagonGrid = () => {
           setHexArray(newArrayValue(res, hexagonalArray));
         });
     };
+
     if (useMock) {
       setHexArray(hexagonalArray);
     } else {
@@ -78,8 +84,8 @@ const HexagonGrid = () => {
     }
   }, []);
 
-  const getNewServerList = () => {
-    const filteredHexWithValues = hexArray
+  const getNewServerList = (arr) => {
+    const filteredHexWithValues = arr
       .filter((hex) => hex.value > 0)
       .map((hex) => {
         return {
@@ -89,6 +95,8 @@ const HexagonGrid = () => {
           value: hex.value,
         };
       });
+    console.log(111, filteredHexWithValues);
+
     setNewItems([]);
     const fetchHexValue = async () => {
       await fetch("http://localhost:13337/2", {
@@ -101,7 +109,7 @@ const HexagonGrid = () => {
         .then((res) => res.json())
         .then((res) => {
           if (res.length === 0) {
-            alert("You lost");
+            setIsGameOver(true);
             return;
           }
           res.forEach((hex: any) => {
@@ -122,8 +130,11 @@ const HexagonGrid = () => {
       if (event.key === "w" || event.key === "W") {
         const handleMovement = new MoveHexagonsTop();
         const newList = handleMovement.execute(hexArray);
-        setHexArray(newList);
-        if (!useMock) getNewServerList();
+        newList.forEach((hex) => {
+          delete hex.hasMerged;
+        });
+        setNewMoves(newList);
+        if (!useMock) getNewServerList(newList);
       }
     };
 
@@ -131,20 +142,20 @@ const HexagonGrid = () => {
       if (event.key === "s" || event.key === "S") {
         const handleMoveDown = new MoveHexagonsDown();
         const newList = handleMoveDown.execute(hexArray);
-        setHexArray(newList);
-        if (!useMock) getNewServerList();
+        setNewMoves(newList);
+        if (!useMock) getNewServerList(newList);
       }
     };
 
     const handleKeyboardBottomLeft = (event: KeyboardEvent) => {
       if (event.key === "a" || event.key === "A") {
-        const handleMoveDown = new MoveHexagonsBottomLeft();
+        const handleMoveDown = new SharedTopMovements("x", "z", "bottom");
         const newList = handleMoveDown.execute(hexArray);
         newList.forEach((hex) => {
           hex.hasMerged = false;
         });
-        setHexArray(newList);
-        if (!useMock) getNewServerList();
+        setNewMoves(newList);
+        if (!useMock) getNewServerList(newList);
       }
     };
 
@@ -155,8 +166,8 @@ const HexagonGrid = () => {
         newList.forEach((hex) => {
           hex.hasMerged = false;
         });
-        setHexArray(newList);
-        if (!useMock) getNewServerList();
+        setNewMoves(newList);
+        if (!useMock) getNewServerList(newList);
       }
     };
 
@@ -168,8 +179,8 @@ const HexagonGrid = () => {
         newList.forEach((hex) => {
           hex.hasMerged = false;
         });
-        setHexArray(newList);
-        if (!useMock) getNewServerList();
+        setNewMoves(newList);
+        if (!useMock) getNewServerList(newList);
       }
     };
 
@@ -181,8 +192,8 @@ const HexagonGrid = () => {
         newList.forEach((hex) => {
           hex.hasMerged = false;
         });
-        setHexArray(newList);
-        if (!useMock) getNewServerList();
+        setNewMoves(newList);
+        if (!useMock) getNewServerList(newList);
       }
     };
 
@@ -221,9 +232,16 @@ const HexagonGrid = () => {
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
+        flexDirection: "column",
         height: "100vh",
       }}
     >
+      <div>
+        Game Status:{" "}
+        <span data-status={isGameOver ? "game-over" : "playing"}>
+          {isGameOver ? "game-over" : "playing"}
+        </span>
+      </div>
       <Grid hexArray={hexArray} manageColor={manageColor} />
     </div>
   );

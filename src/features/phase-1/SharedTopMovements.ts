@@ -5,10 +5,12 @@ import { sharedTopReorderStrategies } from "./sharedTopReorderStrategies";
 export class SharedTopMovements {
   constructor(
     public sortVarDirection: "x" | "y" | "z",
-    public column: "x" | "y" | "z"
+    public column: "x" | "y" | "z",
+    public direction: "bottom" | "top" = "top"
   ) {
     this.sortVarDirection = sortVarDirection;
     this.column = column;
+    this.direction = direction;
   }
 
   getUniqHexagonsColumn(hexagonsArray: HexProps[]) {
@@ -18,6 +20,11 @@ export class SharedTopMovements {
   }
 
   getSortedHexagonsInColumn(hexagonsArray: HexProps[]) {
+    if (this.direction === "bottom") {
+      return hexagonsArray.sort(
+        (a, b) => a[this.sortVarDirection] - b[this.sortVarDirection]
+      );
+    }
     return hexagonsArray.sort(
       (a, b) => b[this.sortVarDirection] - a[this.sortVarDirection]
     );
