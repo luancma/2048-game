@@ -1,4 +1,5 @@
 import { HexProps } from "../../App";
+import { DefaultSortStrategy } from "./reorderStrategies";
 
 const checkIfHasMerged = (hexagonsArray: HexProps[]) => {
   return hexagonsArray?.some((hexagon) => hexagon?.hasMerged === true);
@@ -120,33 +121,58 @@ const DefaultMergeStrategy = (
   }
 };
 
+const Big0Merge = (hexagonGrid: HexProps[]) => {
+  let hasChanged;
+  do {
+    hasChanged = false;
+    for (let i = hexagonGrid.length - 1; i >= 0; i--) {
+      if (
+        hexagonGrid[i]?.value > 0 &&
+        hexagonGrid[i - 1] &&
+        hexagonGrid[i - 1]?.value === hexagonGrid[i]?.value &&
+        hexagonGrid[i]?.hasMerged !== true &&
+        hexagonGrid[i - 1]?.hasMerged !== true
+      ) {
+        console.log({ hexagonGrid });
+        hexagonGrid[i].value *= 2;
+        hexagonGrid[i].hasMerged = true;
+        hexagonGrid[i - 1].value = 0;
+        hasChanged = true;
+      }
+    }
+  } while (hasChanged);
+  return hexagonGrid;
+};
+
 const mergeStrategiesList: any = {
   DefaultMergeStrategy: DefaultMergeStrategy,
+  Big0Merge: Big0Merge,
 };
 
 export const mergeStrategies = (orderedArr: HexProps[]) => {
-  orderedArr.forEach((_, index) => {
-    const currentHexagon = orderedArr[index];
-    const adjacentHexagon = orderedArr[Number(index) + 1];
-    const nextAdjacentHexagon = orderedArr[Number(index) + 2];
+  DefaultSortStrategy(mergeStrategiesList.Big0Merge(orderedArr));
+  // orderedArr.forEach((_, index) => {
+  //   const currentHexagon = orderedArr[index];
+  //   const adjacentHexagon = orderedArr[Number(index) + 1];
+  //   const nextAdjacentHexagon = orderedArr[Number(index) + 2];
 
-    const hasLengthThree =
-      currentHexagon && adjacentHexagon && nextAdjacentHexagon;
+  //   const hasLengthThree =
+  //     currentHexagon && adjacentHexagon && nextAdjacentHexagon;
 
-    const hasMerged =
-      currentHexagon?.hasMerged === true ||
-      adjacentHexagon?.hasMerged === true ||
-      nextAdjacentHexagon?.hasMerged === true;
+  //   const hasMerged =
+  //     currentHexagon?.hasMerged === true ||
+  //     adjacentHexagon?.hasMerged === true ||
+  //     nextAdjacentHexagon?.hasMerged === true;
 
-    for (const strategyKey in mergeStrategiesList) {
-      const strategy = mergeStrategiesList[strategyKey];
-      strategy(
-        currentHexagon,
-        adjacentHexagon,
-        nextAdjacentHexagon,
-        hasLengthThree,
-        hasMerged
-      );
-    }
-  });
+  //   for (const strategyKey in mergeStrategiesList) {
+  //     const strategy = mergeStrategiesList[strategyKey];
+  //     strategy(
+  //       currentHexagon,
+  //       adjacentHexagon,
+  //       nextAdjacentHexagon,
+  //       hasLengthThree,
+  //       hasMerged
+  //     );
+  //   }
+  // });
 };

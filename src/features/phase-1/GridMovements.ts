@@ -25,7 +25,6 @@ export class GridMovements {
 
   reorderGrid(hexagonsArray: HexProps[]) {
     let result: HexProps[] = [];
-
     const uniqHexagonsColumn = this.getUniqHexagonsColumn(hexagonsArray);
 
     for (const uniqColumn of uniqHexagonsColumn) {
