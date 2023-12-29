@@ -1,13 +1,12 @@
 import React from "react";
 import { HexProps } from "../App";
-import { SharedTopMovements } from "../features/phase-1/SharedTopMovements";
+import { GridMovements } from "../features/phase-1/GridMovements";
 
 export const useMoveGrid = ({
   gridArray,
   isGameOver,
   setHexArray,
   fetchNewItems,
-  useMock,
 }: {
   gridArray: HexProps[];
   isGameOver: boolean;
@@ -36,7 +35,7 @@ export const useMoveGrid = ({
     sortVarDirection: "x" | "y" | "z";
     column: "x" | "y" | "z";
   }) => {
-    const handleMovement = new SharedTopMovements(sortVarDirection, column);
+    const handleMovement = new GridMovements(sortVarDirection, column);
     const cloneHexArray = JSON.parse(JSON.stringify(gridArray));
     const newList = handleMovement.execute(cloneHexArray);
     const updatedList = getUpdatedGrid(newList, cloneHexArray);

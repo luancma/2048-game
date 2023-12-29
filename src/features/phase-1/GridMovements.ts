@@ -1,8 +1,8 @@
 import { HexProps } from "../../App";
-import { sharedTopMergeStrategies } from "./sharedTopMergeStrategies";
-import { sharedTopReorderStrategies } from "./sharedTopReorderStrategies";
+import { mergeStrategies } from "./mergeStrategies";
+import { reorderStrategies } from "./reorderStrategies";
 
-export class SharedTopMovements {
+export class GridMovements {
   constructor(
     public sortVarDirection: "x" | "y" | "z",
     public column: "x" | "y" | "z"
@@ -34,7 +34,7 @@ export class SharedTopMovements {
       );
       const sortedHexagonsInColumn =
         this.getSortedHexagonsInColumn(hexagonsInColumn);
-      sharedTopReorderStrategies(sortedHexagonsInColumn);
+      reorderStrategies(sortedHexagonsInColumn);
       result = [...result, ...sortedHexagonsInColumn];
     }
 
@@ -49,7 +49,7 @@ export class SharedTopMovements {
         (hexagon) => hexagon[this.column] === uniqColumn
       );
       hexagons.forEach((_, index) => {
-        sharedTopMergeStrategies(hexagons);
+        mergeStrategies(hexagons);
       });
       result = [...result, ...hexagons];
     }

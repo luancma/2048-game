@@ -1,4 +1,4 @@
-import { SharedTopMovements } from "../SharedTopMovements";
+import { GridMovements } from "../GridMovements";
 import { HandleTopRight } from "../TopRight/HandleTopRight";
 import { newOverrideMock } from "../TopRight/HandleTopRight.test";
 import { MOCK } from "../utils/MOCK";
@@ -6,7 +6,7 @@ import { MOCK } from "../utils/MOCK";
 describe("HandleTopLeft", () => {
   describe("Movements", () => {
     it("should receive 4 0 0 and return 0 0 4", () => {
-      const handleClass = new SharedTopMovements("y", "x");
+      const handleClass = new GridMovements("y", "x");
       const arr = newOverrideMock(MOCK, [
         {
           x: -1,

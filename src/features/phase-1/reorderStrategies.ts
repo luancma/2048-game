@@ -71,13 +71,12 @@ const MoveTwoHexagons = (
   }
 };
 
-const reorderStrategies: any = {
+const reorderStrategiesList: any = {
   MoveTwoHexagons: MoveTwoHexagons,
   MoveSingleHexagon: MoveSingleHexagon,
-  };
-  
+};
 
-export const sharedTopReorderStrategies = (orderedArr: HexProps[]) => {
+export const reorderStrategies = (orderedArr: HexProps[]) => {
   orderedArr.forEach((_, index) => {
     const currentHexagon = orderedArr[index];
     const adjacentHexagon = orderedArr[Number(index) + 1];
@@ -91,8 +90,8 @@ export const sharedTopReorderStrategies = (orderedArr: HexProps[]) => {
       adjacentHexagon?.hasMerged === true ||
       nextAdjacentHexagon?.hasMerged === true;
 
-    for (const strategyKey in reorderStrategies) {
-      const strategy = reorderStrategies[strategyKey];
+    for (const strategyKey in reorderStrategiesList) {
+      const strategy = reorderStrategiesList[strategyKey];
       strategy(
         currentHexagon,
         adjacentHexagon,

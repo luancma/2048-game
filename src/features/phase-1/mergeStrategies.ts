@@ -120,11 +120,11 @@ const DefaultMergeStrategy = (
   }
 };
 
-const mergeStrategies: any = {
+const mergeStrategiesList: any = {
   DefaultMergeStrategy: DefaultMergeStrategy,
 };
 
-export const sharedTopMergeStrategies = (orderedArr: HexProps[]) => {
+export const mergeStrategies = (orderedArr: HexProps[]) => {
   orderedArr.forEach((_, index) => {
     const currentHexagon = orderedArr[index];
     const adjacentHexagon = orderedArr[Number(index) + 1];
@@ -138,8 +138,8 @@ export const sharedTopMergeStrategies = (orderedArr: HexProps[]) => {
       adjacentHexagon?.hasMerged === true ||
       nextAdjacentHexagon?.hasMerged === true;
 
-    for (const strategyKey in mergeStrategies) {
-      const strategy = mergeStrategies[strategyKey];
+    for (const strategyKey in mergeStrategiesList) {
+      const strategy = mergeStrategiesList[strategyKey];
       strategy(
         currentHexagon,
         adjacentHexagon,
