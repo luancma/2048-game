@@ -1,0 +1,49 @@
+:root {
+    --white: #FFFFFF;
+    --item-color-200: #9CA3AF;
+    --item-color-300: #4B5563;
+    --item-color-400: #374151;
+    --item-color-500: #1F2937;
+    --item-color-600: #111827;
+    --item-color-700: #047857;
+    --item-color-800: #065F46;
+    --item-color-900: #064E3B;
+    --item-color-1000: #064E3B;
+}
+
+.grid-item {
+    filter: drop-shadow(0 0 0.5px rgba(0, 0, 0, 0.5));
+    transition: all 0.6s ease-in-out;
+}
+
+[data-value="0"] {
+    fill: var(--white);
+}
+
+[data-value="2"] {
+    fill: var(--item-color-200);
+}
+
+[data-value="4"] {
+    fill: var(--item-color-400);
+}
+
+[data-value="8"] {
+    fill: var(--item-color-500);
+}
+
+[data-value="16"] {
+    fill: var(--item-color-600);
+}
+
+[data-value="32"] {
+    fill: var(--item-color-700);
+}
+
+[data-value="64"] {
+    fill: var(--item-color-800);
+}
+
+[data-value="128"] {
+    fill: var(--item-color-900);
+}

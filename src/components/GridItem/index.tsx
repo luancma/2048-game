@@ -1,29 +1,27 @@
 import { Hexagon, Text } from "react-hexgrid";
 import { HexProps } from "../../App";
+import "./style.css";
 
 type GridItemProps = {
   hex: HexProps;
-  manageColor: (hex: HexProps) => string | undefined;
 };
 
-export const GridItem = ({ hex, manageColor }: GridItemProps) => {
+export const GridItem = ({ hex }: GridItemProps) => {
   return (
     <Hexagon
+      className="grid-item"
       data-y={hex.y}
       data-x={hex.x}
       data-z={hex.z}
       data-value={hex.value}
       key={`${hex.x}-${hex.y}-${hex.z}`}
-      q={hex.y}
-      r={hex.x}
-      s={hex.z}
-      style={{
-        fill: manageColor(hex),
-      }}
+      q={hex.x}
+      s={hex.y}
+      r={hex.z}
     >
       <Text
         style={{
-          fill: "white",
+          fill: "red",
           fontSize: "2px",
           zIndex: 3,
         }}

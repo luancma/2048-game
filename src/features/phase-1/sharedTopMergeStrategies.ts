@@ -1,5 +1,9 @@
 import { HexProps } from "../../App";
 
+const checkIfHasMerged = (hexagonsArray: HexProps[]) => {
+  return hexagonsArray?.some((hexagon) => hexagon?.hasMerged === true);
+};
+
 const DefaultMergeStrategy = (
   currentHexagon: HexProps,
   adjacentHexagon: HexProps,
@@ -12,22 +16,11 @@ const DefaultMergeStrategy = (
     currentHexagon &&
     adjacentHexagon &&
     currentHexagon.value > 0 &&
-    adjacentHexagon.value === currentHexagon.value
+    adjacentHexagon.value === currentHexagon.value &&
+    !checkIfHasMerged([currentHexagon, adjacentHexagon])
   ) {
     adjacentHexagon.value *= 2;
     adjacentHexagon.hasMerged = true;
-    currentHexagon.value = 0;
-  }
-  if (
-    hasLengthThree &&
-    currentHexagon.value === 0 &&
-    adjacentHexagon.value > 0 &&
-    adjacentHexagon.value === nextAdjacentHexagon.value &&
-    !hasMerged
-  ) {
-    nextAdjacentHexagon.value *= 2;
-    nextAdjacentHexagon.hasMerged = true;
-    adjacentHexagon.value = 0;
     currentHexagon.value = 0;
   }
   if (
@@ -35,21 +28,47 @@ const DefaultMergeStrategy = (
     currentHexagon.value > 0 &&
     adjacentHexagon.value > 0 &&
     nextAdjacentHexagon.value > 0 &&
+    currentHexagon.value > adjacentHexagon.value &&
+    adjacentHexagon.value === nextAdjacentHexagon.value &&
+    !checkIfHasMerged([currentHexagon, adjacentHexagon, nextAdjacentHexagon])
+  ) {
+    nextAdjacentHexagon.value *= 2;
+    nextAdjacentHexagon.hasMerged = true;
+    adjacentHexagon.value = currentHexagon.value;
+    currentHexagon.value = 0;
+  }
+  if (
+    hasLengthThree &&
+    currentHexagon.value === 0 &&
+    adjacentHexagon.value > 0 &&
+    adjacentHexagon.value === nextAdjacentHexagon.value &&
+    !checkIfHasMerged([currentHexagon, adjacentHexagon, nextAdjacentHexagon])
+  ) {
+    nextAdjacentHexagon.value *= 2;
+    nextAdjacentHexagon.hasMerged = true;
+    adjacentHexagon.value = 0;
+    currentHexagon.value = 0;
+  }
+  if (
+    !checkIfHasMerged([currentHexagon, adjacentHexagon, nextAdjacentHexagon]) &&
+    hasLengthThree &&
+    currentHexagon.value > 0 &&
+    adjacentHexagon.value > 0 &&
+    nextAdjacentHexagon.value > 0 &&
     currentHexagon.value === adjacentHexagon.value &&
-    nextAdjacentHexagon.value > currentHexagon.value &&
-    !hasMerged
+    nextAdjacentHexagon.value > currentHexagon.value
   ) {
     adjacentHexagon.value *= 2;
     adjacentHexagon.hasMerged = true;
     currentHexagon.value = 0;
   }
   if (
+    !hasMerged &&
     hasLengthThree &&
     currentHexagon.value > 0 &&
     adjacentHexagon.value > 0 &&
     currentHexagon.value === adjacentHexagon.value &&
-    currentHexagon.value === nextAdjacentHexagon.value &&
-    !hasMerged
+    currentHexagon.value === nextAdjacentHexagon.value
   ) {
     nextAdjacentHexagon.value *= 2;
     nextAdjacentHexagon.hasMerged = true;
@@ -95,7 +114,8 @@ const DefaultMergeStrategy = (
     nextAdjacentHexagon.value < currentHexagon.value
   ) {
     nextAdjacentHexagon.hasMerged = true;
-    adjacentHexagon.value *= 2
+    adjacentHexagon.value *= 2;
+    adjacentHexagon.hasMerged = true;
     currentHexagon.value = 0;
   }
 };
