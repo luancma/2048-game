@@ -1,10 +1,10 @@
-import React, { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { HexProps } from "../App";
 
 export const useGameOverManager = (hexArray: HexProps[]) => {
   const [isGameOver, setIsGameOver] = useState<boolean>(false);
 
-  const manageSomeAvailableMovement = React.useCallback(
+  const manageSomeAvailableMovement = useCallback(
     (sortItem: "x" | "y" | "z") => {
       const hasMoves: boolean[] = [];
       [-1, 0, 1].map((column) => {

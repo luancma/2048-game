@@ -1,6 +1,6 @@
-import React, { useCallback } from "react";
+import React, { useEffect, useState } from "react";
 import { Grid } from "../components/Grid";
-import { mockHexagonalArrayRadius2 } from "../mocks/hexagonalArray";
+import { MOCK_3, mockHexagonalArrayRadius2 } from "../mocks/hexagonalArray";
 import { useMoveGrid } from "../hooks/useMoveGrid";
 import { getUrlParams } from "../utils/getUrlParams";
 import { fetchHexValue } from "../utils/api";
@@ -17,7 +17,7 @@ export type HexProps = {
 
 const HexagonGrid = () => {
   const useMock = false;
-  const [hexArray, setHexArray] = React.useState<HexProps[]>([]);
+  const [hexArray, setHexArray] = useState<HexProps[]>([]);
   const { isGameOver } = useGameOverManager(hexArray);
 
   const newArrayValue = (serverArray: HexProps[], localArray: HexProps[]) =>
@@ -34,12 +34,10 @@ const HexagonGrid = () => {
       return hex;
     });
 
-  React.useEffect(() => {
+  useEffect(() => {
     const { radius } = getUrlParams();
 
-    const hexagonalArray = useMock
-      ? mockHexagonalArrayRadius2
-      : generateHexagonalArray(radius);
+    const hexagonalArray = useMock ? MOCK_3 : generateHexagonalArray(radius);
 
     if (useMock) {
       setHexArray(hexagonalArray);

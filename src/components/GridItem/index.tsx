@@ -34,7 +34,7 @@ export const GridItem = ({ hex }: GridItemProps) => {
         style={{
           fill: "red",
           fontSize: "4px",
-          transform: "translate(0, -4px)",
+          transform: "translate(0, -3px)",
         }}
       >
         {hex.value}
