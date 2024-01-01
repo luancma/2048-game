@@ -1,6 +1,6 @@
 import React from "react";
 import { HexProps } from "../App";
-import { GridMovements } from "../features/phase-1/GridMovements";
+import { GridMovements } from "../features/phaseManager/GridMovements";
 
 export const useMoveGrid = ({
   gridArray,

@@ -13,7 +13,7 @@
 
 .grid-item {
     filter: drop-shadow(0 0 0.5px rgba(0, 0, 0, 0.5));
-    transition: all 0.6s ease-in-out;
+    transition: all 0.2s ease-in-out;
 }
 
 [data-value="0"] {

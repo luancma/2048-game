@@ -1,6 +1,6 @@
 import { HexProps } from "../../App";
-import { mergeStrategies } from "./mergeStrategies";
-import { reorderStrategies } from "./reorderStrategies";
+import { mergeHexagonsWithSameValue } from "./utils/mergeHexagonsWithSameValue";
+import { reorderHexagons } from "./utils/reorderHexagons";
 
 export class GridMovements {
   constructor(
@@ -26,14 +26,19 @@ export class GridMovements {
   reorderGrid(hexagonsArray: HexProps[]) {
     let result: HexProps[] = [];
     const uniqHexagonsColumn = this.getUniqHexagonsColumn(hexagonsArray);
-
     for (const uniqColumn of uniqHexagonsColumn) {
       const hexagonsInColumn = hexagonsArray.filter(
         (hexagon) => hexagon[this.column] === uniqColumn
       );
       const sortedHexagonsInColumn =
         this.getSortedHexagonsInColumn(hexagonsInColumn);
-      reorderStrategies(sortedHexagonsInColumn);
+
+      const checkIfHasMerged = (hexagon: HexProps) =>
+        hexagon.hasMerged === true;
+      const hasMerged = hexagonsArray.some(checkIfHasMerged);
+      if (!hasMerged) {
+        reorderHexagons(sortedHexagonsInColumn);
+      }
       result = [...result, ...sortedHexagonsInColumn];
     }
 
@@ -47,17 +52,17 @@ export class GridMovements {
       const hexagons = hexagonsArray.filter(
         (hexagon) => hexagon[this.column] === uniqColumn
       );
-      hexagons.forEach((_, index) => {
-        mergeStrategies(hexagons);
-      });
+      reorderHexagons(mergeHexagonsWithSameValue(hexagons));
       result = [...result, ...hexagons];
     }
     return result;
   }
 
   execute(hexagonsArray: HexProps[]) {
+    console.time();
     const reorderedGrid = this.reorderGrid(hexagonsArray);
     const mergedHexagons = this.mergeHexagons(reorderedGrid);
+    console.timeEnd();
     return mergedHexagons;
   }
 }
