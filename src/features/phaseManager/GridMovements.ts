@@ -59,10 +59,8 @@ export class GridMovements {
   }
 
   execute(hexagonsArray: HexProps[]) {
-    console.time();
     const reorderedGrid = this.reorderGrid(hexagonsArray);
     const mergedHexagons = this.mergeHexagons(reorderedGrid);
-    console.timeEnd();
     return mergedHexagons;
   }
 }

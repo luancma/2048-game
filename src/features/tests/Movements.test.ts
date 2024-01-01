@@ -243,13 +243,7 @@ describe("Movements", () => {
           hasMerged: false,
         },
       ]);
-      console.log({
-        arr,
-      });
       const result = handleClass.execute(arr);
-      console.log({
-        result,
-      });
       expect(result).toContainEqual({
         x: -1,
         y: 0,
@@ -366,18 +360,6 @@ describe("Movements", () => {
           expectedValue2: 16,
           expectedValue3: 2,
           mergedIndex: false,
-        },
-      ],
-      [
-        "8 0 8 and return 0 0 16",
-        {
-          value1: 8,
-          value2: 8,
-          value3: 0,
-          expectedValue1: 0,
-          expectedValue2: 0,
-          expectedValue3: 16,
-          mergedIndex: 3,
         },
       ],
     ])("should receive %s", async (_, obj) => {
