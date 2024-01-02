@@ -23,7 +23,7 @@ export const GridList = ({ hexArray }: GridProps) => {
         origin={{ x: 0, y: 0 }}
       >
        {
-         hexArray?.map((hex: HexProps) => <GridItem hex={hex} />)
+         hexArray?.map((hex: HexProps) => <GridItem key={`${hex.x}-${hex.y}-${hex.z}`} hex={hex} />)
        }
       </Layout>
     </HexGrid>
