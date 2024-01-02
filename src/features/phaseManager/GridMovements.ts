@@ -24,37 +24,42 @@ export class GridMovements {
   }
 
   reorderGrid(hexagonsArray: HexProps[]) {
-    let result: HexProps[] = [];
-    const uniqHexagonsColumn = this.getUniqHexagonsColumn(hexagonsArray);
-    for (const uniqColumn of uniqHexagonsColumn) {
-      const hexagonsInColumn = hexagonsArray.filter(
-        (hexagon) => hexagon[this.column] === uniqColumn
-      );
-      const sortedHexagonsInColumn =
-        this.getSortedHexagonsInColumn(hexagonsInColumn);
+    const clonedArray = Array.from(hexagonsArray);
+    const uniqHexagonsColumn = this.getUniqHexagonsColumn(clonedArray);
 
-      const checkIfHasMerged = (hexagon: HexProps) =>
-        hexagon.hasMerged === true;
-      const hasMerged = hexagonsArray.some(checkIfHasMerged);
-      if (!hasMerged) {
-        reorderHexagons(sortedHexagonsInColumn);
-      }
-      result = [...result, ...sortedHexagonsInColumn];
-    }
+    const hasMerged = clonedArray.some((hexagon) => hexagon.hasMerged === true);
+
+    const result: HexProps[] = uniqHexagonsColumn
+      .map((uniqColumn) => {
+        const hexagonsInColumn = clonedArray.filter(
+          (hexagon) => hexagon[this.column] === uniqColumn
+        );
+
+        const sortedHexagonsInColumn =
+          this.getSortedHexagonsInColumn(hexagonsInColumn);
+
+        if (!hasMerged) {
+          reorderHexagons(sortedHexagonsInColumn);
+        }
+
+        return sortedHexagonsInColumn;
+      })
+      .flat();
 
     return result;
   }
 
   mergeHexagons(hexagonsArray: HexProps[]) {
-    let result: HexProps[] = [];
     const uniqHexagonsColumn = this.getUniqHexagonsColumn(hexagonsArray);
-    for (const uniqColumn of uniqHexagonsColumn) {
-      const hexagons = hexagonsArray.filter(
-        (hexagon) => hexagon[this.column] === uniqColumn
-      );
-      reorderHexagons(mergeHexagonsWithSameValue(hexagons));
-      result = [...result, ...hexagons];
-    }
+    const result: HexProps[] = uniqHexagonsColumn
+      .map((uniqColumn) => {
+        const hexagons = hexagonsArray.filter(
+          (hexagon) => hexagon[this.column] === uniqColumn
+        );
+        reorderHexagons(mergeHexagonsWithSameValue(hexagons));
+        return hexagons;
+      })
+      .flat();
     return result;
   }
 

@@ -1,4 +1,4 @@
-import { HexProps } from "../../../App";
+import { HexProps } from "../../App";
 
 export const overrideMock = (mock: HexProps[], override: HexProps[]) => {
   const arr = mock.map((item) => {
