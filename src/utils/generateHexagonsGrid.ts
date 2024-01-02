@@ -1,17 +1,15 @@
 import { HexProps } from "../App";
 
 export function generateHexagonalArray(receivedRadius: number): HexProps[] {
-  let radius = receivedRadius;
+  const radiusMapping = {
+    2: 2,
+    3: 4,
+    4: 6,
+  } as {
+    [index: number]: number;
+  };
 
-  if (receivedRadius < 3) {
-    radius = 2;
-  } else if (receivedRadius === 3) {
-    radius = 4;
-  } else if (receivedRadius === 4) {
-    radius = 6;
-  } else {
-    radius = 2;
-  }
+  let radius = radiusMapping[receivedRadius] || 2;
 
   const hexArray: HexProps[] = [];
 

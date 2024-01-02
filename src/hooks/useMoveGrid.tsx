@@ -12,21 +12,17 @@ export const useMoveGrid = ({
   isGameOver: boolean;
   setHexArray: React.Dispatch<React.SetStateAction<HexProps[]>>;
   fetchNewItems: (updatedList: Omit<HexProps, "hasMerged">[]) => Promise<void>;
-  useMock: boolean;
 }) => {
-  const getUpdatedGrid = (newList: HexProps[], oldArray: HexProps[]) => {
-    const newArrayTest = oldArray.map((hex: HexProps) => {
+  const getUpdatedGrid = (
+    newList: HexProps[],
+    oldArray: HexProps[]
+  ): HexProps[] =>
+    oldArray.map((hex) => {
       const newHex = newList.find(
-        (item: HexProps) =>
-          item.x === hex.x && item.y === hex.y && item.z === hex.z
+        ({ x, y, z }) => x === hex.x && y === hex.y && z === hex.z
       );
-      if (newHex) {
-        return newHex;
-      }
-      return hex;
+      return newHex || hex;
     });
-    return newArrayTest;
-  };
 
   const handleMovements = ({
     sortVarDirection,
@@ -36,12 +32,11 @@ export const useMoveGrid = ({
     column: "x" | "y" | "z";
   }) => {
     const handleMovement = new GridMovements(sortVarDirection, column);
-    const cloneHexArray = JSON.parse(JSON.stringify(gridArray));
-    const newList = handleMovement.execute(cloneHexArray);
-    const updatedList = getUpdatedGrid(newList, cloneHexArray);
-    newList.forEach((hex) => {
-      delete hex.hasMerged;
-    });
+    const newList = handleMovement.execute([...gridArray]);
+    const updatedList = getUpdatedGrid(
+      newList,
+      gridArray.map((hex) => ({ ...hex, hasMerged: undefined }))
+    );
     setHexArray(updatedList);
     fetchNewItems(updatedList);
   };

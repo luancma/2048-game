@@ -16,6 +16,14 @@
     transition: all 0.1s cubic-bezier(0, 0, 1, 1);
 }
 
+.item-text {
+    font-size: 4px;
+    font-weight: 700;
+    text-align: center;
+    fill: var(--white);
+    transition: all 0.1s cubic-bezier(0, 0, 1, 1);
+}
+
 [data-value="0"] {
     fill: var(--white);
 }
