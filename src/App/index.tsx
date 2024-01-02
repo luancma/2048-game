@@ -1,4 +1,9 @@
-import React, { useEffect, useState } from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useState,
+} from "react";
 import { GridList } from "../components/GridList";
 import { useMoveGrid } from "../hooks/useMoveGrid";
 import { getUrlParams } from "../utils/getUrlParams";
@@ -33,9 +38,21 @@ const HexagonGrid = () => {
       return hex;
     });
 
+  const setDefaultUrlParams = useCallback(() => {
+    if (window.location.search === "") {
+      const defaultHostname = window.location.hostname;
+      const defaultPort = 13337;
+      const defaultRadius = 2;
+      window.location.search = `?hostname=${defaultHostname}&port=${defaultPort}&radius=${defaultRadius}`;
+    }
+  }, []);
+
+  useLayoutEffect(() => {
+    setDefaultUrlParams();
+  }, [setDefaultUrlParams]);
+
   useEffect(() => {
     const { radius } = getUrlParams();
-
     const hexagonalArray = generateHexagonalArray(radius);
 
     fetchHexValue({
