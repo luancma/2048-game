@@ -19,26 +19,7 @@ export const GridItem = ({ hex }: GridItemProps) => {
       s={hex.y}
       r={hex.z}
     >
-      <Text
-        style={{
-          fill: "red",
-          fontSize: "2px",
-          zIndex: 3,
-        }}
-      >
-        x: {hex.x}
-        y: {hex.y}
-        z: {hex.z}
-      </Text>
-      <Text
-        style={{
-          fill: "red",
-          fontSize: "4px",
-          transform: "translate(0, -3px)",
-        }}
-      >
-        {hex.value}
-      </Text>
+      <Text className="item-text">{hex.value}</Text>
     </Hexagon>
   );
 };

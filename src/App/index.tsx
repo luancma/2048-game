@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from "react";
-import { Grid } from "../components/Grid";
-import { MOCK_3, mockHexagonalArrayRadius2 } from "../mocks/hexagonalArray";
+import { GridList } from "../components/GridList";
 import { useMoveGrid } from "../hooks/useMoveGrid";
 import { getUrlParams } from "../utils/getUrlParams";
 import { fetchHexValue } from "../utils/api";
 import { generateHexagonalArray } from "../utils/generateHexagonsGrid";
 import { useGameOverManager } from "../hooks/useGameOverManager";
+import "./styles.css";
 
 export type HexProps = {
   x: number;
@@ -16,7 +16,6 @@ export type HexProps = {
 };
 
 const HexagonGrid = () => {
-  const useMock = false;
   const [hexArray, setHexArray] = useState<HexProps[]>([]);
   const { isGameOver } = useGameOverManager(hexArray);
 
@@ -37,17 +36,13 @@ const HexagonGrid = () => {
   useEffect(() => {
     const { radius } = getUrlParams();
 
-    const hexagonalArray = useMock ? MOCK_3 : generateHexagonalArray(radius);
+    const hexagonalArray = generateHexagonalArray(radius);
 
-    if (useMock) {
-      setHexArray(hexagonalArray);
-    } else {
-      fetchHexValue({
-        currentHexArray: [],
-      }).then((res) => {
-        setHexArray(newArrayValue(res, hexagonalArray));
-      });
-    }
+    fetchHexValue({
+      currentHexArray: [],
+    }).then((res) => {
+      setHexArray(newArrayValue(res, hexagonalArray));
+    });
   }, []);
 
   const getNewServerList = async (
@@ -74,26 +69,17 @@ const HexagonGrid = () => {
     isGameOver,
     setHexArray,
     fetchNewItems: getNewServerList,
-    useMock,
   });
 
   return (
-    <div
-      style={{
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        flexDirection: "column",
-        height: "100vh",
-      }}
-    >
-      <div>
-        Game Status:{" "}
+    <div className="container">
+      <GridList hexArray={hexArray} />
+      <div className="game-status">
+        Game Status:
         <span data-status={isGameOver ? "game-over" : "playing"}>
           {isGameOver ? "game-over" : "playing"}
         </span>
       </div>
-      <Grid hexArray={hexArray} />
     </div>
   );
 };
