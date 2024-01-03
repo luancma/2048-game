@@ -1,5 +1,14 @@
 # Hexagonal 2048
 
+
+## OBS: 
+I could not make all the tests run with success, 2 of them are failing although the ones related with the game flow are working fine.
+
+Image bellow:
+
+![Tests:](image.png)
+
+
 ## Task description
 
 Your task is to develop a game [2048](https://play2048.co/) on a hexagonal field.
