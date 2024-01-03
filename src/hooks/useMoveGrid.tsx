@@ -29,11 +29,11 @@ export const useMoveGrid = () => {
     }) => {
       const handleMovement = new GridMovements(sortVarDirection, column);
       const newList = handleMovement.execute([...gridArray]);
+      setHexArray(newList);
       const updatedList = getUpdatedGrid(
         newList,
         gridArray.map((hex) => ({ ...hex, hasMerged: undefined }))
       );
-      setHexArray(updatedList);
       fetchNewItems(updatedList);
     },
     [gridArray, fetchNewItems, setHexArray]

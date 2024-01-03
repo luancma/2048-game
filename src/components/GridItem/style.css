@@ -13,12 +13,7 @@
 
 .grid-item {
     filter: drop-shadow(0 0 0.5px rgba(0, 0, 0, 0.5));
-    transition: all 0.1s cubic-bezier(0, 0, 1, 1);
-}
-
-[data-newitem="true"] {
-    animation: blink-animation 0.1s linear;
-    animation-delay: 0.5s;
+    transition: all 0.3s cubic-bezier(0, 0, 1, 1);
 }
 
 .item-text {
@@ -26,7 +21,10 @@
     font-weight: 700;
     text-align: center;
     fill: var(--white);
-    transition: all 0.1s cubic-bezier(0, 0, 1, 1);
+}
+
+.grid-item[data-newitem="true"] .item-text {
+    animation: zoom-in-out 0.4s linear;
 }
 
 [data-value="0"] {
@@ -61,16 +59,16 @@
     fill: var(--item-color-900);
 }
 
-@keyframes blink-animation {
+@keyframes zoom-in-out {
     0% {
-        opacity: 0;
+        transform: scale(1);
     }
 
-    50% {
-        opacity: 1;
+    30%, 50% {
+        transform: scale(2);
     }
 
     100% {
-        opacity: 0;
+        transform: scale(1);
     }
 }

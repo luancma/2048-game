@@ -17,10 +17,11 @@ export const useFetchNewHexagons = () => {
       res.forEach((hex: any) => {
         delete hex.hasMerged;
       });
+      const mergedList = gridArray.filter((hex) => hex.hasMerged);
+      setNewHexagons(mergedList);
       gridArray.forEach((hex) => {
         delete hex.hasMerged;
       });
-      setNewHexagons(res);
       const newList = mergeArrays(res, updatedList);
       setHexArray(newList);
     });

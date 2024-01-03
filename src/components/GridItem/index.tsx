@@ -9,6 +9,10 @@ type GridItemProps = {
 
 export const GridItem = ({ hex }: GridItemProps) => {
   const { newHexagons } = useGridContext();
+  console.log(newHexagons);
+  const itemsBoBeAnimated = newHexagons.some(
+    (item) => item.x === hex.x && item.y === hex.y && item.z === hex.z
+  );
   return (
     <Hexagon
       className="grid-item"
@@ -20,14 +24,7 @@ export const GridItem = ({ hex }: GridItemProps) => {
       q={hex.x}
       s={hex.y}
       r={hex.z}
-      data-newitem={
-        newHexagons.some(
-          (newHex) =>
-            newHex.x === hex.x && newHex.y === hex.y && newHex.z === hex.z
-        )
-          ? "true"
-          : "false"
-      }
+      data-newitem={itemsBoBeAnimated ? "true" : "false"}
     >
       <Text className="item-text">{hex.value}</Text>
     </Hexagon>
