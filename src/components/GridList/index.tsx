@@ -1,12 +1,11 @@
 import { HexGrid, Layout } from "react-hexgrid";
 import { HexProps } from "../../App";
 import { GridItem } from "../GridItem";
+import { useGridContext } from "../../context/GridContext";
 
-type GridProps = {
-  hexArray: HexProps[];
-};
+export const GridList = () => {
+  const { gridArray } = useGridContext();
 
-export const GridList = ({ hexArray }: GridProps) => {
   return (
     <HexGrid
       width={"100%"}
@@ -22,9 +21,9 @@ export const GridList = ({ hexArray }: GridProps) => {
         spacing={1.1}
         origin={{ x: 0, y: 0 }}
       >
-       {
-         hexArray?.map((hex: HexProps) => <GridItem key={`${hex.x}-${hex.y}-${hex.z}`} hex={hex} />)
-       }
+        {gridArray?.map((hex: HexProps) => (
+          <GridItem key={`${hex.x}-${hex.y}-${hex.z}`} hex={hex} />
+        ))}
       </Layout>
     </HexGrid>
   );

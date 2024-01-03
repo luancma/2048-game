@@ -1,16 +1,10 @@
-import React, {
-  useCallback,
-  useEffect,
-  useLayoutEffect,
-  useState,
-} from "react";
+import React from "react";
 import { GridList } from "../components/GridList";
 import { useMoveGrid } from "../hooks/useMoveGrid";
-import { getUrlParams } from "../utils/getUrlParams";
-import { fetchHexValue } from "../utils/api";
-import { generateHexagonalArray } from "../utils/generateHexagonsGrid";
-import { useGameOverManager } from "../hooks/useGameOverManager";
 import "./styles.css";
+import { GridProvider, useGridContext } from "../context/GridContext";
+import { useFetchInitialGrid } from "../hooks/useFetchInitialGrid";
+import { useAddUrlSearch } from "../hooks/useAddUrlSearch";
 
 export type HexProps = {
   x: number;
@@ -21,86 +15,36 @@ export type HexProps = {
 };
 
 const HexagonGrid = () => {
-  const [hexArray, setHexArray] = useState<HexProps[]>([]);
-  const { isGameOver } = useGameOverManager(hexArray);
+  const { isError, isGameOver, isIdle } = useGridContext();
+  useAddUrlSearch();
+  useFetchInitialGrid();
+  useMoveGrid();
 
-  const newArrayValue = (serverArray: HexProps[], localArray: HexProps[]) =>
-    localArray.map((hex: HexProps) => {
-      const serverHex = serverArray.find(
-        (serverHex: HexProps) =>
-          serverHex.x === hex.x &&
-          serverHex.y === hex.y &&
-          serverHex.z === hex.z
-      );
-      if (serverHex) {
-        return serverHex;
-      }
-      return hex;
-    });
-
-  const setDefaultUrlParams = useCallback(() => {
-    if (window.location.search === "") {
-      const defaultHostname = window.location.hostname;
-      const defaultPort = 13337;
-      const defaultRadius = 2;
-      window.location.search = `?hostname=${defaultHostname}&port=${defaultPort}&radius=${defaultRadius}`;
-    }
-  }, []);
-
-  useLayoutEffect(() => {
-    setDefaultUrlParams();
-  }, [setDefaultUrlParams]);
-
-  useEffect(() => {
-    const { radius } = getUrlParams();
-    const hexagonalArray = generateHexagonalArray(radius);
-
-    fetchHexValue({
-      currentHexArray: [],
-    }).then((res) => {
-      setHexArray(newArrayValue(res, hexagonalArray));
-    });
-  }, []);
-
-  const getNewServerList = async (
-    updatedList: Omit<HexProps, "hasMerged">[]
-  ) => {
-    const hexGridWithoutZero = updatedList.filter((hex) => hex.value > 0);
-
-    return fetchHexValue({
-      currentHexArray: hexGridWithoutZero,
-    }).then((res) => {
-      res.forEach((hex: any) => {
-        delete hex.hasMerged;
-      });
-      hexArray.forEach((hex) => {
-        delete hex.hasMerged;
-      });
-      const newList = newArrayValue(res, updatedList);
-      setHexArray(newList);
-    });
+  const getGameStatus = () => {
+    if ((isGameOver && isError) || isError) return "network-error";
+    if (isGameOver) return "game-over";
+    return "playing";
   };
-
-  useMoveGrid({
-    gridArray: hexArray,
-    isGameOver,
-    setHexArray,
-    fetchNewItems: getNewServerList,
-  });
 
   return (
     <div className="container">
-      <GridList hexArray={hexArray} />
-      <div className="game-status">
-        Game Status:
-        <span data-status={isGameOver ? "game-over" : "playing"}>
-          {isGameOver ? "game-over" : "playing"}
-        </span>
-      </div>
+      {isIdle ? null : (
+        <>
+          <GridList />
+          <div className="game-status">
+            Game Status:{" "}
+            <span data-status={getGameStatus()}>{getGameStatus()}</span>
+          </div>
+        </>
+      )}
     </div>
   );
 };
 
 export const App: React.FC = () => {
-  return <HexagonGrid />;
+  return (
+    <GridProvider>
+      <HexagonGrid />
+    </GridProvider>
+  );
 };
