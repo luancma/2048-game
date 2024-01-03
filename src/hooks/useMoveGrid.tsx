@@ -1,18 +1,13 @@
-import React from "react";
+import { useCallback, useEffect } from "react";
 import { HexProps } from "../App";
 import { GridMovements } from "../features/phaseManager/GridMovements";
+import { useGridContext } from "../context/GridContext";
+import { useFetchNewHexagons } from "./useFetchNewHexagons";
 
-export const useMoveGrid = ({
-  gridArray,
-  isGameOver,
-  setHexArray,
-  fetchNewItems,
-}: {
-  gridArray: HexProps[];
-  isGameOver: boolean;
-  setHexArray: React.Dispatch<React.SetStateAction<HexProps[]>>;
-  fetchNewItems: (updatedList: Omit<HexProps, "hasMerged">[]) => Promise<void>;
-}) => {
+export const useMoveGrid = () => {
+  const { gridArray, setHexArray, isError, isGameOver } = useGridContext();
+  const { fetchNewItems } = useFetchNewHexagons();
+
   const getUpdatedGrid = (
     newList: HexProps[],
     oldArray: HexProps[]
@@ -24,24 +19,27 @@ export const useMoveGrid = ({
       return newHex || hex;
     });
 
-  const handleMovements = ({
-    sortVarDirection,
-    column,
-  }: {
-    sortVarDirection: "x" | "y" | "z";
-    column: "x" | "y" | "z";
-  }) => {
-    const handleMovement = new GridMovements(sortVarDirection, column);
-    const newList = handleMovement.execute([...gridArray]);
-    const updatedList = getUpdatedGrid(
-      newList,
-      gridArray.map((hex) => ({ ...hex, hasMerged: undefined }))
-    );
-    setHexArray(updatedList);
-    fetchNewItems(updatedList);
-  };
+  const handleMovements = useCallback(
+    ({
+      sortVarDirection,
+      column,
+    }: {
+      sortVarDirection: "x" | "y" | "z";
+      column: "x" | "y" | "z";
+    }) => {
+      const handleMovement = new GridMovements(sortVarDirection, column);
+      const newList = handleMovement.execute([...gridArray]);
+      const updatedList = getUpdatedGrid(
+        newList,
+        gridArray.map((hex) => ({ ...hex, hasMerged: undefined }))
+      );
+      setHexArray(updatedList);
+      fetchNewItems(updatedList);
+    },
+    [gridArray, fetchNewItems, setHexArray]
+  );
 
-  React.useEffect(() => {
+  useEffect(() => {
     const handleKeyDownEvent = (event: KeyboardEvent) => {
       switch (event.key) {
         case "w" || "W": {
@@ -67,7 +65,7 @@ export const useMoveGrid = ({
       }
     };
 
-    if (isGameOver) {
+    if (isGameOver || isError) {
       return;
     } else {
       window.addEventListener("keyup", handleKeyDownEvent);
@@ -76,5 +74,12 @@ export const useMoveGrid = ({
         window.removeEventListener("keyup", handleKeyDownEvent);
       };
     }
-  }, [gridArray, isGameOver, fetchNewItems]);
+  }, [
+    gridArray,
+    isGameOver,
+    fetchNewItems,
+    isError,
+    setHexArray,
+    handleMovements,
+  ]);
 };

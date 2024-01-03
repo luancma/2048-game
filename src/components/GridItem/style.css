@@ -16,6 +16,11 @@
     transition: all 0.1s cubic-bezier(0, 0, 1, 1);
 }
 
+[data-newitem="true"] {
+    animation: blink-animation 0.1s linear;
+    animation-delay: 0.5s;
+}
+
 .item-text {
     font-size: 4px;
     font-weight: 700;
@@ -54,4 +59,18 @@
 
 [data-value="128"] {
     fill: var(--item-color-900);
+}
+
+@keyframes blink-animation {
+    0% {
+        opacity: 0;
+    }
+
+    50% {
+        opacity: 1;
+    }
+
+    100% {
+        opacity: 0;
+    }
 }
