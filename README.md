@@ -1,5 +1,14 @@
 # Hexagonal 2048
 
+How to run: 
+
+```
+npm install
+npm run start-server
+npm run start
+```
+Notice: If the install fail try to use `npm install --legacy-peer-deps`
+
 ## URL:
 https://2048-luan.surge.sh
 
