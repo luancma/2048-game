@@ -12,11 +12,6 @@ Notice: If the install fail try to use `npm install --legacy-peer-deps`
 ## URL:
 https://2048-luan.surge.sh
 
-Image bellow:
-
-![Tests:](image.png)
-
-
 ## Task description
 
 Your task is to develop a game [2048](https://play2048.co/) on a hexagonal field.
