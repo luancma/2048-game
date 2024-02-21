@@ -12,9 +12,6 @@ Notice: If the install fail try to use `npm install --legacy-peer-deps`
 ## URL:
 https://2048-luan.surge.sh
 
-#### OBS: 
-I could not make all the tests run with success, 2 of them are failing although the ones related with the game flow are working fine.
-
 Image bellow:
 
 ![Tests:](image.png)
