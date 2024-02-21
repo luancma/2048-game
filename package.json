@@ -53,5 +53,8 @@
   },
   "devDependencies": {
     "ts-jest": "^26.5.6"
+  },
+  "engines": {
+    "node": ">=15"
   }
 }

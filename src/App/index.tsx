@@ -15,7 +15,7 @@ export type HexProps = {
 };
 
 const HexagonGrid = () => {
-  const { isError, isGameOver, isIdle } = useGridContext();
+  const { isError, isGameOver, isIdle, gridArray } = useGridContext();
   useAddUrlSearch();
   useFetchInitialGrid();
   useMoveGrid();
@@ -25,6 +25,8 @@ const HexagonGrid = () => {
     if (isGameOver) return "game-over";
     return "playing";
   };
+
+  console.log(gridArray)
 
   return (
     <div className="container">

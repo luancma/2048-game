@@ -42,22 +42,28 @@ export const useMoveGrid = () => {
   useEffect(() => {
     const handleKeyDownEvent = (event: KeyboardEvent) => {
       switch (event.key) {
-        case "w" || "W": {
+        case "w":
+        case "W": {
           return handleMovements({ sortVarDirection: "z", column: "x" });
         }
-        case "s" || "S": {
+        case "s":
+        case "S": {
           return handleMovements({ sortVarDirection: "y", column: "x" });
         }
-        case "a" || "A": {
+        case "a":
+        case "A": {
           return handleMovements({ sortVarDirection: "x", column: "y" });
         }
-        case "d" || "D": {
+        case "d":
+        case "D": {
           return handleMovements({ sortVarDirection: "y", column: "z" });
         }
-        case "e" || "E": {
+        case "e":
+        case "E": {
           return handleMovements({ sortVarDirection: "z", column: "y" });
         }
-        case "q" || "Q": {
+        case "q":
+        case "Q": {
           return handleMovements({ sortVarDirection: "x", column: "z" });
         }
         default:
